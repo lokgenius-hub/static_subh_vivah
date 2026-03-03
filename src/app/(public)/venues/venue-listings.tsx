@@ -12,6 +12,7 @@ const demoVenues = [
     price_per_plate: 800, amenities: ["AC", "Parking", "Catering", "DJ/Music", "Decoration"],
     cover_image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=600&q=80",
     images: [], is_featured: true, is_active: true, rating: 4.8, total_reviews: 124, created_at: "", updated_at: "",
+    youtube_videos: [], social_links: {},
   },
   {
     id: "2", vendor_id: "v2", name: "Garden Paradise Resort", slug: "garden-paradise-resort",
@@ -21,6 +22,7 @@ const demoVenues = [
     price_per_plate: 1200, amenities: ["Lawn", "Parking", "Catering", "Swimming Pool", "Bridal Suite"],
     cover_image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=600&q=80",
     images: [], is_featured: true, is_active: true, rating: 4.6, total_reviews: 89, created_at: "", updated_at: "",
+    youtube_videos: [], social_links: {},
   },
   {
     id: "3", vendor_id: "v3", name: "Heritage Haveli", slug: "heritage-haveli",
@@ -30,6 +32,7 @@ const demoVenues = [
     price_per_plate: 1000, amenities: ["AC", "Parking", "Hawan Kund", "Mandap Setup", "Stage"],
     cover_image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=600&q=80",
     images: [], is_featured: true, is_active: true, rating: 4.9, total_reviews: 67, created_at: "", updated_at: "",
+    youtube_videos: [], social_links: {},
   },
   {
     id: "4", vendor_id: "v4", name: "Lakeside Farmhouse", slug: "lakeside-farmhouse",
@@ -39,6 +42,7 @@ const demoVenues = [
     price_per_plate: 600, amenities: ["Lawn", "Parking", "Kitchen", "Generator Backup"],
     cover_image: "https://images.unsplash.com/photo-1510076857177-7470076d4098?w=600&q=80",
     images: [], is_featured: true, is_active: true, rating: 4.5, total_reviews: 42, created_at: "", updated_at: "",
+    youtube_videos: [], social_links: {},
   },
   {
     id: "5", vendor_id: "v5", name: "Grand Convention Center", slug: "grand-convention-center",
@@ -48,6 +52,7 @@ const demoVenues = [
     price_per_plate: 1500, amenities: ["AC", "Parking", "Catering", "Valet", "WiFi"],
     cover_image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=600&q=80",
     images: [], is_featured: true, is_active: true, rating: 4.7, total_reviews: 156, created_at: "", updated_at: "",
+    youtube_videos: [], social_links: {},
   },
   {
     id: "6", vendor_id: "v6", name: "Bhabua Valley Lawns", slug: "bhabua-valley-lawns",
@@ -57,6 +62,7 @@ const demoVenues = [
     price_per_plate: 500, amenities: ["Lawn", "Parking", "Mandap Setup", "Hawan Kund"],
     cover_image: "https://images.unsplash.com/photo-1478146059778-26028b07395a?w=600&q=80",
     images: [], is_featured: true, is_active: true, rating: 4.4, total_reviews: 38, created_at: "", updated_at: "",
+    youtube_videos: [], social_links: {},
   },
 ];
 
