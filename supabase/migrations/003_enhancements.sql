@@ -1,23 +1,14 @@
 -- ============================================================
--- VivahSthal - Enhancement Migration
--- 1. Add youtube_videos & social_links to venues
--- 2. Create blog_posts table
--- Run this in Supabase Dashboard → SQL Editor
+-- VivahSthal - Enhancement Migration (patch for existing DBs)
+-- If starting fresh, use 000_consolidated_schema.sql instead.
 -- ============================================================
 
--- ── Venues: YouTube videos (multiple embed URLs) ──────────
+-- ── Venues: YouTube videos ────────────────────────────────
 DO $$ BEGIN
-  ALTER TABLE venues ADD COLUMN youtube_videos TEXT[] DEFAULT '{}';
-EXCEPTION WHEN duplicate_column THEN NULL;
-END $$;
-
--- ── Venues: Social media links (partner's own handles) ────
--- Format: { "instagram": "url", "facebook": "url",
---           "twitter": "url", "youtube": "url",
---           "whatsapp": "91XXXXXXXXXX" }
-DO $$ BEGIN
-  ALTER TABLE venues ADD COLUMN social_links JSONB DEFAULT '{}';
-EXCEPTION WHEN duplicate_column THEN NULL;
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'venues') THEN
+    ALTER TABLE venues ADD COLUMN IF NOT EXISTS youtube_videos TEXT[] DEFAULT '{}';
+    ALTER TABLE venues ADD COLUMN IF NOT EXISTS social_links   JSONB DEFAULT '{}';
+  END IF;
 END $$;
 
 -- ── Blog Posts ─────────────────────────────────────────────
