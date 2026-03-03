@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Phone, Users, Settings, Shield, LogOut, BookOpen } from "lucide-react";
+import { LayoutDashboard, Phone, Users, Settings, Shield, LogOut, BookOpen, Home } from "lucide-react";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 
 export default async function AdminLayout({
