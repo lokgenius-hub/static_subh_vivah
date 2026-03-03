@@ -1,15 +1,13 @@
 -- ============================================================
--- VivahSthal - Enhancement Migration (patch for existing DBs)
--- If starting fresh, use 000_consolidated_schema.sql instead.
+-- VivahSthal - Enhancement Migration
+-- Adds: youtube_videos & social_links to venues + blog_posts table
+-- Run this in Supabase Dashboard → SQL Editor
+-- (Your DB already has 001 + 002 applied)
 -- ============================================================
 
--- ── Venues: YouTube videos ────────────────────────────────
-DO $$ BEGIN
-  IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'venues') THEN
-    ALTER TABLE venues ADD COLUMN IF NOT EXISTS youtube_videos TEXT[] DEFAULT '{}';
-    ALTER TABLE venues ADD COLUMN IF NOT EXISTS social_links   JSONB DEFAULT '{}';
-  END IF;
-END $$;
+-- ── Add new columns to existing venues table ──────────────
+ALTER TABLE venues ADD COLUMN IF NOT EXISTS youtube_videos TEXT[] DEFAULT '{}';
+ALTER TABLE venues ADD COLUMN IF NOT EXISTS social_links   JSONB DEFAULT '{}';
 
 -- ── Blog Posts ─────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS blog_posts (
