@@ -51,6 +51,14 @@ export interface Venue {
   amenities: string[];
   cover_image: string | null;
   images: string[];
+  youtube_videos: string[];
+  social_links: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+    youtube?: string;
+    whatsapp?: string;
+  };
   is_featured: boolean;
   is_active: boolean;
   rating: number;
@@ -121,6 +129,23 @@ export interface VenueReview {
   comment: string | null;
   created_at: string;
   user?: Profile;
+}
+
+export interface BlogPost {
+  id: string;
+  author_id: string | null;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string | null;
+  cover_image: string | null;
+  youtube_url: string | null;
+  tags: string[];
+  is_published: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+  author?: Profile;
 }
 
 // Search / filter types

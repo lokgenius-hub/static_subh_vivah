@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Phone, Users, Settings, Home, Shield, LogOut } from "lucide-react";
+import { LayoutDashboard, Phone, Users, Settings, Shield, LogOut, BookOpen } from "lucide-react";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 
 export default async function AdminLayout({
@@ -57,6 +57,7 @@ export default async function AdminLayout({
             { href: "/admin/leads", icon: Phone, label: "Leads" },
             { href: "/admin/venues", icon: LayoutDashboard, label: "All Venues" },
             { href: "/admin/users", icon: Users, label: "Users" },
+            { href: "/admin/blog", icon: BookOpen, label: "Blog & Ads" },
             { href: "/admin/settings", icon: Settings, label: "Settings" },
           ].map((item) => (
             <Link

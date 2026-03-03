@@ -8,6 +8,7 @@ import { AvailabilityCalendar } from "@/components/venue/availability-calendar";
 import {
   MapPin, Users, Star, Clock, Check, Wifi,
   Car, UtensilsCrossed, Music, Camera, Shield,
+  Instagram, Facebook, Twitter, Youtube, Phone,
 } from "lucide-react";
 
 // Demo venue for when the DB is empty
@@ -57,6 +58,8 @@ const demoVenue = {
   is_active: true,
   rating: 4.8,
   total_reviews: 124,
+  youtube_videos: [] as string[],
+  social_links: {},
   created_at: "",
   updated_at: "",
 };
@@ -203,6 +206,73 @@ export default async function VenueDetailPage({
                 })}
               </div>
             </section>
+
+            {/* YouTube Videos */}
+            {venue.youtube_videos && venue.youtube_videos.length > 0 && (
+              <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Youtube className="h-5 w-5 text-red-500" /> Venue Videos
+                </h2>
+                <div className="grid grid-cols-1 gap-4">
+                  {venue.youtube_videos.map((url, i) => {
+                    // Convert watch?v= URL to embed URL
+                    const embedUrl = url
+                      .replace("watch?v=", "embed/")
+                      .replace("youtu.be/", "youtube.com/embed/");
+                    return (
+                      <div key={i} className="relative aspect-video rounded-xl overflow-hidden bg-black">
+                        <iframe
+                          src={embedUrl}
+                          title={`${venue.name} video ${i + 1}`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="absolute inset-0 w-full h-full"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* Social Media */}
+            {venue.social_links && Object.values(venue.social_links).some(Boolean) && (
+              <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h2 className="text-xl font-bold mb-4">Connect with Venue</h2>
+                <div className="flex flex-wrap gap-3">
+                  {venue.social_links.instagram && (
+                    <a href={venue.social_links.instagram} target="_blank" rel="noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                      <Instagram className="h-4 w-4" /> Instagram
+                    </a>
+                  )}
+                  {venue.social_links.facebook && (
+                    <a href={venue.social_links.facebook} target="_blank" rel="noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                      <Facebook className="h-4 w-4" /> Facebook
+                    </a>
+                  )}
+                  {venue.social_links.twitter && (
+                    <a href={venue.social_links.twitter} target="_blank" rel="noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-sky-500 text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                      <Twitter className="h-4 w-4" /> Twitter
+                    </a>
+                  )}
+                  {venue.social_links.youtube && (
+                    <a href={venue.social_links.youtube} target="_blank" rel="noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                      <Youtube className="h-4 w-4" /> YouTube
+                    </a>
+                  )}
+                  {venue.social_links.whatsapp && (
+                    <a href={`https://wa.me/${venue.social_links.whatsapp}`} target="_blank" rel="noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500 text-white text-sm font-medium hover:opacity-90 transition-opacity">
+                      <Phone className="h-4 w-4" /> WhatsApp
+                    </a>
+                  )}
+                </div>
+              </section>
+            )}
 
             {/* Availability Calendar */}
             <AvailabilityCalendar

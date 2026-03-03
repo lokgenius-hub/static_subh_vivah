@@ -2,7 +2,7 @@
 
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import type { Lead, Venue, VenueSlot, VenueSearchParams } from "@/lib/types";
+import type { Lead, Venue, VenueSlot, VenueSearchParams, BlogPost } from "@/lib/types";
 import { sendVendorEnquiryEmail, sendOtpEmail } from "@/lib/email";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -578,6 +578,12 @@ export async function updateVenue(venueId: string, formData: FormData) {
   const amenitiesRaw = formData.get("amenities") as string | null;
   if (amenitiesRaw) updates.amenities = JSON.parse(amenitiesRaw);
 
+  const ytRaw = formData.get("youtube_videos") as string | null;
+  if (ytRaw) updates.youtube_videos = JSON.parse(ytRaw);
+
+  const socialRaw = formData.get("social_links") as string | null;
+  if (socialRaw) updates.social_links = JSON.parse(socialRaw);
+
   if (images.length > 0) {
     updates.images = images;
     updates.cover_image = coverImage;
@@ -636,6 +642,8 @@ export async function createVenue(formData: FormData) {
       ? parseFloat(formData.get("price_per_plate") as string)
       : null,
     amenities: JSON.parse(formData.get("amenities") as string || "[]"),
+    youtube_videos: JSON.parse(formData.get("youtube_videos") as string || "[]"),
+    social_links: JSON.parse(formData.get("social_links") as string || "{}"),
     images,
     cover_image: coverImage,
   };
@@ -958,4 +966,116 @@ export async function getAdminStats() {
     newLeads: leads.filter(l => l.status === "new").length,
     convertedLeads: leads.filter(l => l.status === "converted").length,
   };
+}
+
+// ============================================================
+// BLOG ACTIONS
+// ============================================================
+
+export async function getBlogPosts(publishedOnly = true): Promise<BlogPost[]> {
+  const supabase = await createServiceClient();
+  let query = supabase
+    .from("blog_posts")
+    .select("*, author:author_id(id, full_name, avatar_url)")
+    .order("published_at", { ascending: false });
+
+  if (publishedOnly) query = query.eq("is_published", true);
+
+  const { data, error } = await query;
+  if (error) { console.error("getBlogPosts error:", error); return []; }
+  return (data ?? []) as BlogPost[];
+}
+
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const supabase = await createServiceClient();
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .select("*, author:author_id(id, full_name, avatar_url)")
+    .eq("slug", slug)
+    .single();
+  if (error) return null;
+  return data as BlogPost;
+}
+
+export async function createBlogPost(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const profile = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile.data?.role !== "admin") return { success: false, error: "Admin only" };
+
+  const title = formData.get("title") as string;
+  const slug = title.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-") + "-" + Date.now();
+  const isPublished = formData.get("is_published") === "true";
+
+  const post = {
+    author_id: user.id,
+    title,
+    slug,
+    excerpt: formData.get("excerpt") as string || null,
+    content: formData.get("content") as string || null,
+    cover_image: formData.get("cover_image") as string || null,
+    youtube_url: formData.get("youtube_url") as string || null,
+    tags: JSON.parse(formData.get("tags") as string || "[]"),
+    is_published: isPublished,
+    published_at: isPublished ? new Date().toISOString() : null,
+  };
+
+  const svc = await createServiceClient();
+  const { data, error } = await svc.from("blog_posts").insert(post).select().single();
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/blog");
+  revalidatePath("/admin/blog");
+  return { success: true, post: data };
+}
+
+export async function updateBlogPost(postId: string, formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const profile = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile.data?.role !== "admin") return { success: false, error: "Admin only" };
+
+  const isPublished = formData.get("is_published") === "true";
+
+  const updates: Record<string, unknown> = {
+    title: formData.get("title"),
+    excerpt: formData.get("excerpt") || null,
+    content: formData.get("content") || null,
+    cover_image: formData.get("cover_image") || null,
+    youtube_url: formData.get("youtube_url") || null,
+    tags: JSON.parse(formData.get("tags") as string || "[]"),
+    is_published: isPublished,
+    updated_at: new Date().toISOString(),
+  };
+  if (isPublished) updates.published_at = new Date().toISOString();
+
+  const svc = await createServiceClient();
+  const { data, error } = await svc.from("blog_posts").update(updates).eq("id", postId).select().single();
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/blog");
+  revalidatePath(`/blog/${data.slug}`);
+  revalidatePath("/admin/blog");
+  return { success: true, post: data };
+}
+
+export async function deleteBlogPost(postId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const profile = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile.data?.role !== "admin") return { success: false, error: "Admin only" };
+
+  const svc = await createServiceClient();
+  const { error } = await svc.from("blog_posts").delete().eq("id", postId);
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/blog");
+  revalidatePath("/admin/blog");
+  return { success: true };
 }
