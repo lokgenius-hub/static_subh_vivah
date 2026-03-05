@@ -2,7 +2,7 @@
 
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import type { Lead, Venue, VenueSlot, VenueSearchParams, BlogPost } from "@/lib/types";
+import type { Lead, Venue, VenueSlot, VenueSearchParams, BlogPost, EnquiryInbox, MarriagePackage, Testimonial, SuccessStory } from "@/lib/types";
 import { sendVendorEnquiryEmail, sendOtpEmail } from "@/lib/email";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -12,6 +12,9 @@ const otpStore = new Map<string, { otp: string; expiresAt: number; name: string;
 // ============================================================
 // VENDOR EMAIL NOTIFICATION (fire-and-forget)
 // ============================================================
+
+const SUPER_ADMIN_EMAIL = "admin@vivahsthal.com";
+const SUPER_ADMIN_WHATSAPP = "918000000000"; // Replace with actual
 
 async function notifyVendorByEmail(
   serviceClient: SupabaseClient,
@@ -25,7 +28,8 @@ async function notifyVendorByEmail(
     slotPreference?: string;
     budgetRange?: string;
     message?: string;
-  }
+  },
+  leadId?: string
 ) {
   const { data: venue } = await serviceClient
     .from("venues")
@@ -37,12 +41,13 @@ async function notifyVendorByEmail(
 
   const { data: vendor } = await serviceClient
     .from("profiles")
-    .select("full_name, email")
+    .select("full_name, email, phone")
     .eq("id", venue.vendor_id)
     .single();
 
   if (!vendor?.email) return;
 
+  // 1. Send email to vendor
   await sendVendorEnquiryEmail({
     vendorEmail: vendor.email,
     vendorName: vendor.full_name || "Vendor",
@@ -56,6 +61,49 @@ async function notifyVendorByEmail(
     budgetRange: lead.budgetRange,
     message: lead.message,
   });
+
+  // 2. Send email to super admin
+  await sendVendorEnquiryEmail({
+    vendorEmail: SUPER_ADMIN_EMAIL,
+    vendorName: "Super Admin",
+    customerName: lead.customerName,
+    customerPhone: lead.customerPhone,
+    customerEmail: lead.customerEmail,
+    venueName: venue.name,
+    eventDate: lead.eventDate,
+    guestCount: lead.guestCount,
+    slotPreference: lead.slotPreference,
+    budgetRange: lead.budgetRange,
+    message: `[Vendor: ${vendor.full_name}] ${lead.message || ""}`,
+  });
+
+  // 3. Save to enquiry inbox
+  await serviceClient.from("enquiry_inbox").insert({
+    lead_id: leadId || null,
+    venue_id: venueId,
+    vendor_id: venue.vendor_id,
+    customer_name: lead.customerName,
+    customer_phone: lead.customerPhone,
+    customer_email: lead.customerEmail || null,
+    event_date: lead.eventDate || null,
+    guest_count: lead.guestCount || null,
+    slot_preference: lead.slotPreference || null,
+    budget_range: lead.budgetRange || null,
+    message: lead.message || null,
+    source: "website",
+  });
+
+  // 4. WhatsApp notification links (auto-compose messages)
+  // These are logged; in production, integrate with WhatsApp Business API
+  const whatsappMsg = encodeURIComponent(
+    `🎊 New Enquiry for ${venue.name}!\n\nCustomer: ${lead.customerName}\nPhone: ${lead.customerPhone}\n${lead.eventDate ? `Date: ${lead.eventDate}\n` : ""}${lead.guestCount ? `Guests: ${lead.guestCount}\n` : ""}${lead.message ? `Message: ${lead.message}` : ""}`
+  );
+
+  // Log WhatsApp links (vendor phone & super admin)
+  if (vendor.phone) {
+    console.log(`WhatsApp Vendor: https://wa.me/${vendor.phone.replace(/\D/g, "")}?text=${whatsappMsg}`);
+  }
+  console.log(`WhatsApp Admin: https://wa.me/${SUPER_ADMIN_WHATSAPP}?text=${whatsappMsg}`);
 }
 
 // ============================================================
@@ -462,7 +510,7 @@ export async function createLead(formData: FormData) {
     return { success: false, error: error.message };
   }
 
-  // Send email notification to vendor (fire-and-forget, don't block the response)
+  // Send email notification to vendor + super admin (fire-and-forget, don't block the response)
   if (isValidUUID && rawVenueId) {
     notifyVendorByEmail(serviceClient, rawVenueId, {
       customerName: formData.get("customer_name") as string,
@@ -473,7 +521,7 @@ export async function createLead(formData: FormData) {
       slotPreference: (formData.get("slot_preference") as string) || undefined,
       budgetRange: (formData.get("budget_range") as string) || undefined,
       message: (formData.get("message") as string) || undefined,
-    }).catch((err) => console.error("Vendor email notification failed:", err));
+    }, data?.id).catch((err) => console.error("Vendor email notification failed:", err));
   }
 
   revalidatePath("/admin/leads");
@@ -1078,4 +1126,189 @@ export async function deleteBlogPost(postId: string) {
   revalidatePath("/blog");
   revalidatePath("/admin/blog");
   return { success: true };
+}
+
+// ============================================================
+// ENQUIRY INBOX
+// ============================================================
+
+export async function getInboxMessages(vendorId?: string): Promise<EnquiryInbox[]> {
+  const svc = await createServiceClient();
+  let query = svc
+    .from("enquiry_inbox")
+    .select("*, venue:venues(name, city, cover_image)")
+    .order("created_at", { ascending: false });
+
+  if (vendorId) query = query.eq("vendor_id", vendorId);
+
+  const { data, error } = await query;
+  if (error) { console.error("getInboxMessages error:", error); return []; }
+  return (data ?? []) as EnquiryInbox[];
+}
+
+export async function markInboxRead(messageId: string) {
+  const svc = await createServiceClient();
+  const { error } = await svc.from("enquiry_inbox").update({ is_read: true }).eq("id", messageId);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/admin/inbox");
+  revalidatePath("/partner/inbox");
+  return { success: true };
+}
+
+export async function addInboxNote(messageId: string, note: string) {
+  const svc = await createServiceClient();
+  const { error } = await svc.from("enquiry_inbox").update({ admin_notes: note }).eq("id", messageId);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/admin/inbox");
+  return { success: true };
+}
+
+// ============================================================
+// MARRIAGE PACKAGES
+// ============================================================
+
+export async function getMarriagePackages(activeOnly = true): Promise<MarriagePackage[]> {
+  const svc = await createServiceClient();
+  let query = svc
+    .from("marriage_packages")
+    .select("*")
+    .order("display_order", { ascending: true });
+
+  if (activeOnly) query = query.eq("is_active", true);
+
+  const { data, error } = await query;
+  if (error) { console.error("getMarriagePackages error:", error); return []; }
+  return (data ?? []) as MarriagePackage[];
+}
+
+export async function createMarriagePackage(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const svc = await createServiceClient();
+  const profile = await svc.from("profiles").select("role").eq("id", user.id).single();
+  if (profile.data?.role !== "admin") return { success: false, error: "Admin only" };
+
+  const name = formData.get("name") as string;
+  const slug = name.toLowerCase().replace(/[^\w ]+/g, "").replace(/ +/g, "-") + "-" + Date.now();
+
+  const pkg = {
+    name,
+    slug,
+    tier: formData.get("tier") as string,
+    tagline: formData.get("tagline") as string || null,
+    description: formData.get("description") as string || null,
+    price: parseFloat(formData.get("price") as string) || 0,
+    original_price: formData.get("original_price") ? parseFloat(formData.get("original_price") as string) : null,
+    features: JSON.parse(formData.get("features") as string || "[]"),
+    inclusions: JSON.parse(formData.get("inclusions") as string || "[]"),
+    cover_image: formData.get("cover_image") as string || null,
+    is_popular: formData.get("is_popular") === "true",
+    display_order: parseInt(formData.get("display_order") as string) || 0,
+  };
+
+  const { data, error } = await svc.from("marriage_packages").insert(pkg).select().single();
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/packages");
+  revalidatePath("/admin/packages");
+  return { success: true, package: data };
+}
+
+export async function updateMarriagePackage(packageId: string, formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const svc = await createServiceClient();
+  const profile = await svc.from("profiles").select("role").eq("id", user.id).single();
+  if (profile.data?.role !== "admin") return { success: false, error: "Admin only" };
+
+  const updates: Record<string, unknown> = {
+    name: formData.get("name"),
+    tier: formData.get("tier"),
+    tagline: formData.get("tagline") || null,
+    description: formData.get("description") || null,
+    price: parseFloat(formData.get("price") as string) || 0,
+    original_price: formData.get("original_price") ? parseFloat(formData.get("original_price") as string) : null,
+    features: JSON.parse(formData.get("features") as string || "[]"),
+    inclusions: JSON.parse(formData.get("inclusions") as string || "[]"),
+    cover_image: formData.get("cover_image") || null,
+    is_popular: formData.get("is_popular") === "true",
+    display_order: parseInt(formData.get("display_order") as string) || 0,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await svc.from("marriage_packages").update(updates).eq("id", packageId).select().single();
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/packages");
+  revalidatePath("/admin/packages");
+  return { success: true, package: data };
+}
+
+export async function deleteMarriagePackage(packageId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const svc = await createServiceClient();
+  const profile = await svc.from("profiles").select("role").eq("id", user.id).single();
+  if (profile.data?.role !== "admin") return { success: false, error: "Admin only" };
+
+  const { error } = await svc.from("marriage_packages").delete().eq("id", packageId);
+  if (error) return { success: false, error: error.message };
+
+  revalidatePath("/packages");
+  revalidatePath("/admin/packages");
+  return { success: true };
+}
+
+// ============================================================
+// TESTIMONIALS
+// ============================================================
+
+export async function getTestimonials(featuredOnly = false): Promise<Testimonial[]> {
+  const svc = await createServiceClient();
+  let query = svc
+    .from("testimonials")
+    .select("*")
+    .eq("is_active", true)
+    .order("display_order", { ascending: true });
+
+  if (featuredOnly) query = query.eq("is_featured", true);
+
+  const { data, error } = await query;
+  if (error) { console.error("getTestimonials error:", error); return []; }
+  return (data ?? []) as Testimonial[];
+}
+
+// ============================================================
+// SUCCESS STORIES
+// ============================================================
+
+export async function getSuccessStories(publishedOnly = true): Promise<SuccessStory[]> {
+  const svc = await createServiceClient();
+  let query = svc
+    .from("success_stories")
+    .select("*")
+    .order("published_at", { ascending: false });
+
+  if (publishedOnly) query = query.eq("is_published", true);
+
+  const { data, error } = await query;
+  if (error) { console.error("getSuccessStories error:", error); return []; }
+  return (data ?? []) as SuccessStory[];
+}
+
+export async function getSuccessStoryBySlug(slug: string): Promise<SuccessStory | null> {
+  const svc = await createServiceClient();
+  const { data, error } = await svc
+    .from("success_stories")
+    .select("*")
+    .eq("slug", slug)
+    .single();
+  if (error) return null;
+  return data as SuccessStory;
 }

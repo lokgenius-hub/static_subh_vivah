@@ -11,7 +11,9 @@ import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const navLinks = [
   { href: "/venues", label: "Venues" },
-  { href: "/venues?auspicious=true", label: "Auspicious Dates" },
+  { href: "/packages", label: "Packages" },
+  { href: "/testimonials", label: "Testimonials" },
+  { href: "/stories", label: "Success Stories" },
   { href: "/blog", label: "Blog" },
   { href: "/about", label: "About" },
 ];

@@ -1,9 +1,8 @@
-// ── Kaimur District (Bihar) locations ──────────────────────
-// To add a new location: just append a new string to this array.
-// Example: add "Ramgarh" → add `"Ramgarh",` at the end before `] as const;`
-// See LOCATIONS_GUIDE.md for full instructions.
+// ── Kaimur District & nearby (Bihar) locations ────────────
+// Primary focus: Bhabua, Sasaram area → then expand
 export const CITIES = [
-  "Bhabua",     // District HQ
+  "Bhabua",     // District HQ — Primary
+  "Sasaram",    // Rohtas HQ — Primary
   "Mohania",
   "Chainpur",
   "Bhagwanpur",
@@ -14,6 +13,10 @@ export const CITIES = [
   "Kudra",
   "Nuaon",
   "Durgawati",
+  "Dehri",
+  "Bikramganj",
+  "Kochas",
+  "Rohtas",
 ] as const;
 
 export const VENUE_TYPES = [

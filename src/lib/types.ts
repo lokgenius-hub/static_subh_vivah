@@ -148,6 +148,81 @@ export interface BlogPost {
   author?: Profile;
 }
 
+export interface EnquiryInbox {
+  id: string;
+  lead_id: string | null;
+  venue_id: string;
+  vendor_id: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string | null;
+  event_date: string | null;
+  guest_count: number | null;
+  slot_preference: string | null;
+  budget_range: string | null;
+  message: string | null;
+  source: string;
+  is_read: boolean;
+  admin_notes: string | null;
+  created_at: string;
+  updated_at: string;
+  venue?: Venue;
+}
+
+export interface MarriagePackage {
+  id: string;
+  name: string;
+  slug: string;
+  tier: "silver" | "golden" | "diamond" | "custom";
+  tagline: string | null;
+  description: string | null;
+  price: number;
+  original_price: number | null;
+  features: { title: string; desc: string }[];
+  inclusions: string[];
+  cover_image: string | null;
+  images: string[];
+  is_popular: boolean;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Testimonial {
+  id: string;
+  couple_name: string;
+  location: string;
+  venue_name: string | null;
+  event_date: string | null;
+  rating: number;
+  text: string;
+  avatar_url: string | null;
+  photo_url: string | null;
+  is_featured: boolean;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+}
+
+export interface SuccessStory {
+  id: string;
+  couple_name: string;
+  slug: string;
+  location: string;
+  venue_name: string | null;
+  event_date: string | null;
+  story: string;
+  excerpt: string | null;
+  cover_image: string | null;
+  images: string[];
+  youtube_url: string | null;
+  is_published: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // Search / filter types
 export interface VenueSearchParams {
   city?: string;

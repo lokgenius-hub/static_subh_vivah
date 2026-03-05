@@ -1,28 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 const testimonials = [
   {
     name: "Priya & Arjun",
-    location: "Patna",
+    location: "Bhabua",
     rating: 5,
-    text: "VivahSthal made our venue search so easy! The AI assistant suggested the perfect heritage venue in Patna. Our wedding was absolutely magical.",
+    text: "VivahSthal made our venue search so easy! We found the perfect banquet hall in Bhabua within minutes. Our wedding was absolutely magical and the entire process was stress-free.",
     avatar: "PA",
   },
   {
     name: "Sneha & Rohan",
-    location: "Gaya",
+    location: "Sasaram",
     rating: 5,
-    text: "We found our dream farmhouse within minutes. The auspicious date filter was incredibly helpful for our traditional ceremony. Highly recommended!",
+    text: "We found our dream farmhouse in Sasaram within minutes. The auspicious date filter was incredibly helpful for our traditional ceremony. Highly recommended for anyone in Rohtas!",
     avatar: "SR",
   },
   {
     name: "Anita & Vikram",
-    location: "Muzaffarpur",
+    location: "Mohania",
     rating: 5,
-    text: "The Relationship Manager assigned to us was amazing. They helped negotiate the best price and ensured everything was perfect for our big day.",
+    text: "The team helped us find a beautiful lawn venue in Mohania. They negotiated the best price and ensured everything was perfect for our big day. Best service in Kaimur district!",
     avatar: "AV",
   },
 ];
@@ -68,6 +69,15 @@ export function Testimonials() {
               <p className="text-sm text-gray-600 leading-relaxed">{t.text}</p>
             </motion.div>
           ))}
+        </div>
+
+        <div className="mt-10 text-center">
+          <Link
+            href="/testimonials"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-primary)] hover:underline"
+          >
+            Read more testimonials <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </section>

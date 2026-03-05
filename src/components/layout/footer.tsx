@@ -6,12 +6,12 @@ import {
 
 const footerLinks = {
   "Popular Cities": [
-    { label: "Wedding Venues in Patna", href: "/venues?city=Patna" },
-    { label: "Wedding Venues in Gaya", href: "/venues?city=Gaya" },
-    { label: "Wedding Venues in Muzaffarpur", href: "/venues?city=Muzaffarpur" },
-    { label: "Wedding Venues in Bhagalpur", href: "/venues?city=Bhagalpur" },
-    { label: "Wedding Venues in Delhi", href: "/venues?city=Delhi" },
     { label: "Wedding Venues in Bhabua", href: "/venues?city=Bhabua" },
+    { label: "Wedding Venues in Sasaram", href: "/venues?city=Sasaram" },
+    { label: "Wedding Venues in Mohania", href: "/venues?city=Mohania" },
+    { label: "Wedding Venues in Chainpur", href: "/venues?city=Chainpur" },
+    { label: "Wedding Venues in Dehri", href: "/venues?city=Dehri" },
+    { label: "Wedding Venues in Bikramganj", href: "/venues?city=Bikramganj" },
   ],
   "Venue Types": [
     { label: "Banquet Halls", href: "/venues?type=banquet_hall" },
@@ -23,11 +23,11 @@ const footerLinks = {
   ],
   Company: [
     { label: "About Us", href: "/about" },
+    { label: "Wedding Packages", href: "/packages" },
+    { label: "Testimonials", href: "/testimonials" },
+    { label: "Success Stories", href: "/stories" },
     { label: "Blog & Wedding Tips", href: "/blog" },
     { label: "List Your Venue", href: "/partner-register" },
-    { label: "Contact Us", href: "/about#contact" },
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms & Conditions", href: "/terms" },
   ],
 };
 
@@ -39,10 +39,10 @@ const organizationSchema = {
   url: "https://www.vivahsthal.com",
   logo: "https://www.vivahsthal.com/logo.png",
   description:
-    "India's premium wedding venue marketplace. Find banquet halls, resorts, farmhouses and heritage venues across Bihar and India with AI-powered search and real-time availability.",
+    "Bihar's premium wedding venue marketplace serving Bhabua, Sasaram, Kaimur, Rohtas and surrounding areas. Find banquet halls, resorts, farmhouses and lawn venues with AI-powered search and real-time availability.",
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Patna",
+    addressLocality: "Bhabua",
     addressRegion: "Bihar",
     addressCountry: "IN",
   },
@@ -89,17 +89,19 @@ export function Footer() {
         <div className="border-b border-gray-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
             <p className="text-center text-xs text-gray-500 leading-relaxed max-w-4xl mx-auto">
-              VivahSthal is Bihar&apos;s #1 wedding venue booking platform — find{" "}
+              VivahSthal is Kaimur &amp; Rohtas&apos;s #1 wedding venue booking platform — find{" "}
               <Link href="/venues?type=banquet_hall" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">banquet halls</Link>,{" "}
               <Link href="/venues?type=farmhouse" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">farmhouses</Link>,{" "}
               <Link href="/venues?type=resort" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">wedding resorts</Link>,{" "}
               <Link href="/venues?type=lawn" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">lawn &amp; garden venues</Link> and{" "}
               <Link href="/venues?type=heritage" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">heritage havelis</Link> in{" "}
-              <Link href="/venues?city=Patna" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">Patna</Link>,{" "}
-              <Link href="/venues?city=Gaya" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">Gaya</Link>,{" "}
-              <Link href="/venues?city=Muzaffarpur" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">Muzaffarpur</Link>,{" "}
-              <Link href="/venues?city=Bhagalpur" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">Bhagalpur</Link> and across India.
-              Compare prices, check real-time availability, and book your perfect shaadi venue in minutes.
+              <Link href="/venues?city=Bhabua" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">Bhabua</Link>,{" "}
+              <Link href="/venues?city=Sasaram" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">Sasaram</Link>,{" "}
+              <Link href="/venues?city=Mohania" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">Mohania</Link>,{" "}
+              <Link href="/venues?city=Chainpur" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">Chainpur</Link>,{" "}
+              <Link href="/venues?city=Dehri" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">Dehri-on-Sone</Link> and across Bihar.
+              Compare prices, check real-time availability, browse{" "}
+              <Link href="/packages" className="hover:text-[var(--color-primary-light)] hover:underline underline-offset-2">wedding packages</Link> and book your perfect shaadi venue in minutes.
             </p>
           </div>
         </div>
@@ -119,9 +121,9 @@ export function Footer() {
                 </span>
               </Link>
               <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-                India&apos;s premium wedding venue marketplace. Find the perfect
-                banquet hall, farmhouse or resort for your dream shaadi with
-                AI-powered search and real-time availability.
+                Kaimur &amp; Rohtas&apos;s premium wedding venue marketplace. Find the perfect
+                banquet hall, farmhouse or lawn for your dream shaadi in Bhabua, Sasaram,
+                Mohania, Chainpur and surrounding areas.
               </p>
 
               {/* Contact Info */}
@@ -133,7 +135,7 @@ export function Footer() {
                   <Phone className="h-3.5 w-3.5" /> +91 800 000 0000
                 </a>
                 <p className="flex items-center gap-2 text-xs text-gray-500">
-                  <MapPin className="h-3.5 w-3.5 shrink-0" /> Gandhi Maidan, Patna, Bihar 800001
+                  <MapPin className="h-3.5 w-3.5 shrink-0" /> Main Road, Bhabua, Kaimur, Bihar 821101
                 </p>
               </div>
 

@@ -6,6 +6,7 @@ import { VenueTypes } from "./sections/venue-types";
 import { Stats } from "./sections/stats";
 import { Testimonials } from "./sections/testimonials";
 import { CTASection } from "./sections/cta";
+import { PricingPreview } from "./sections/pricing-preview";
 
 export default function HomePage() {
   return (
@@ -16,6 +17,7 @@ export default function HomePage() {
         <FeaturedVenues />
       </Suspense>
       <VenueTypes />
+      <PricingPreview />
       <HowItWorks />
       <Testimonials />
       <CTASection />

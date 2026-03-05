@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Building2, Calendar, Settings, Home } from "lucide-react";
+import { Building2, Calendar, Settings, Home, Mail } from "lucide-react";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 import { MobilePartnerNav } from "@/components/layout/mobile-partner-nav";
 
@@ -40,6 +40,7 @@ export default async function PartnerLayout({
 
   const navItems = [
     { href: "/partner/venues", icon: Building2, label: "My Venues" },
+    { href: "/partner/inbox", icon: Mail, label: "Enquiry Inbox" },
     { href: "/partner/calendar", icon: Calendar, label: "Availability" },
     { href: "/partner/settings", icon: Settings, label: "Settings" },
   ];
