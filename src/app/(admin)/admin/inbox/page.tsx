@@ -141,12 +141,21 @@ export default function AdminInboxPage() {
                     {msg.customer_name.split(" ").map(n => n[0]).join("").slice(0, 2)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-semibold text-white truncate">{msg.customer_name}</p>
                       {!msg.is_read && (
                         <span className="h-2 w-2 rounded-full bg-[var(--color-primary)] shrink-0" />
                       )}
                     </div>
+                    {/* Venue Name */}
+                    {(msg as EnquiryInbox & { venue?: { name: string } }).venue?.name ? (
+                      <div className="flex items-center gap-1 mt-1 text-xs text-[var(--color-primary)] font-medium">
+                        <Building2 className="h-3 w-3" />
+                        <span>{(msg as EnquiryInbox & { venue?: { name: string } }).venue!.name}</span>
+                      </div>
+                    ) : (
+                      <div className="text-xs text-gray-500 mt-0.5 italic">General Enquiry</div>
+                    )}
                     <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-400">
                       <span className="flex items-center gap-1">
                         <Phone className="h-3 w-3" /> {msg.customer_phone}
@@ -154,6 +163,17 @@ export default function AdminInboxPage() {
                       {msg.customer_email && (
                         <span className="flex items-center gap-1">
                           <Mail className="h-3 w-3" /> {msg.customer_email}
+                        </span>
+                      )}
+                      {msg.event_date && (
+                        <span className="flex items-center gap-1 text-amber-400">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(msg.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "2-digit" })}
+                        </span>
+                      )}
+                      {msg.guest_count && (
+                        <span className="flex items-center gap-1 text-blue-400">
+                          <Users className="h-3 w-3" /> {msg.guest_count} guests
                         </span>
                       )}
                     </div>

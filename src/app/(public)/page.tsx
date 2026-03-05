@@ -4,14 +4,11 @@ import { FeaturedVenues } from "./sections/featured-venues";
 import { HowItWorks } from "./sections/how-it-works";
 import { VenueTypes } from "./sections/venue-types";
 import { Stats } from "./sections/stats";
-import { Testimonials } from "./sections/testimonials";
+import { TestimonialsSection } from "./sections/testimonials-section";
 import { CTASection } from "./sections/cta";
 import { PricingPreview } from "./sections/pricing-preview";
-import { getTestimonials } from "@/lib/actions";
 
-export default async function HomePage() {
-  const testimonials = await getTestimonials(true);
-
+export default function HomePage() {
   return (
     <>
       <HeroSection />
@@ -22,7 +19,9 @@ export default async function HomePage() {
       <VenueTypes />
       <PricingPreview />
       <HowItWorks />
-      <Testimonials testimonials={testimonials} />
+      <Suspense fallback={<div className="h-64 animate-pulse bg-gray-50" />}>
+        <TestimonialsSection />
+      </Suspense>
       <CTASection />
     </>
   );

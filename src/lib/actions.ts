@@ -954,6 +954,22 @@ export async function updateUserRole(userId: string, newRole: string) {
   return { success: true };
 }
 
+export async function adminSetUserPassword(userId: string, newPassword: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const serviceClient = await createServiceClient();
+  const { data: profile } = await serviceClient.from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "admin") return { success: false, error: "Admin access required" };
+
+  if (newPassword.length < 8) return { success: false, error: "Password must be at least 8 characters" };
+
+  const { error } = await serviceClient.auth.admin.updateUserById(userId, { password: newPassword });
+  if (error) return { success: false, error: error.message };
+  return { success: true };
+}
+
 // ============================================================
 // PARTNER: PROFILE MANAGEMENT
 // ============================================================
