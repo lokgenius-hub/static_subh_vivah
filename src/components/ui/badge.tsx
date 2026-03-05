@@ -14,7 +14,7 @@ export function Badge({ className, variant = "default", children, ...props }: Ba
     warning: "bg-yellow-100 text-yellow-800",
     danger: "bg-red-100 text-red-800",
     info: "bg-blue-100 text-blue-800",
-    gold: "bg-gradient-gold text-white",
+    gold: "bg-gradient-primary text-white",
   };
 
   return (

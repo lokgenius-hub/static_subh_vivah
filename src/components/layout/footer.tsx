@@ -112,11 +112,11 @@ export function Footer() {
             {/* Brand */}
             <div className="lg:col-span-2 space-y-4">
               <Link href="/" className="flex items-center gap-2" aria-label="VivahSthal Home">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-gold">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-primary">
                   <span className="text-white font-bold text-lg">V</span>
                 </div>
                 <span className="text-xl font-bold">
-                  <span className="text-gradient-gold">Vivah</span>
+                  <span className="text-gradient-primary">Vivah</span>
                   <span className="text-white">Sthal</span>
                 </span>
               </Link>
@@ -189,13 +189,13 @@ export function Footer() {
           {/* Trust Badges */}
           <div className="mt-12 py-6 border-t border-b border-gray-800 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             {[
-              { stat: "500+", label: "Registered Venues" },
-              { stat: "10,000+", label: "Happy Couples" },
-              { stat: "20+ Cities", label: "Across Bihar & India" },
-              { stat: "4.8 ★", label: "Average Venue Rating" },
+              { stat: "20+", label: "Verified Venues" },
+              { stat: "200+", label: "Happy Couples" },
+              { stat: "8+ Cities", label: "Kaimur & Rohtas" },
+              { stat: "4.8 ★", label: "Average Rating" },
             ].map(({ stat, label }) => (
               <div key={label}>
-                <p className="text-lg font-bold text-gradient-gold">{stat}</p>
+                <p className="text-lg font-bold text-gradient-primary">{stat}</p>
                 <p className="text-xs text-gray-500 mt-0.5">{label}</p>
               </div>
             ))}

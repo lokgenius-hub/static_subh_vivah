@@ -66,7 +66,7 @@ export function AIChatbot() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-gradient-gold shadow-2xl flex items-center justify-center hover:shadow-3xl hover:scale-105 transition-all group"
+            className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-gradient-primary shadow-2xl flex items-center justify-center hover:shadow-3xl hover:scale-105 transition-all group"
           >
             <MessageCircle className="h-6 w-6 text-white" />
             <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-[var(--color-accent)] animate-pulse" />
@@ -85,7 +85,7 @@ export function AIChatbot() {
             className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-6rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className="bg-gradient-gold p-4 flex items-center justify-between shrink-0">
+            <div className="bg-gradient-primary p-4 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
                   <Sparkles className="h-5 w-5 text-white" />
@@ -121,7 +121,7 @@ export function AIChatbot() {
                     )}
                   >
                     {message.role === "assistant" && (
-                      <div className="h-7 w-7 rounded-full bg-gradient-gold flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="h-7 w-7 rounded-full bg-gradient-primary flex items-center justify-center shrink-0 mt-0.5">
                         <Bot className="h-3.5 w-3.5 text-white" />
                       </div>
                     )}
@@ -145,7 +145,7 @@ export function AIChatbot() {
               })}
               {isLoading && (
                 <div className="flex gap-2.5">
-                  <div className="h-7 w-7 rounded-full bg-gradient-gold flex items-center justify-center shrink-0">
+                  <div className="h-7 w-7 rounded-full bg-gradient-primary flex items-center justify-center shrink-0">
                     <Bot className="h-3.5 w-3.5 text-white" />
                   </div>
                   <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-3">
@@ -196,7 +196,7 @@ export function AIChatbot() {
               <button
                 type="submit"
                 disabled={isLoading || !inputValue.trim()}
-                className="h-10 w-10 rounded-full bg-gradient-gold flex items-center justify-center text-white disabled:opacity-50 hover:brightness-110 transition-all shrink-0"
+                className="h-10 w-10 rounded-full bg-gradient-primary flex items-center justify-center text-white disabled:opacity-50 hover:brightness-110 transition-all shrink-0"
               >
                 <Send className="h-4 w-4" />
               </button>

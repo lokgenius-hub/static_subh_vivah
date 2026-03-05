@@ -162,7 +162,7 @@ export function LeadForm({
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             >
-              <div className="bg-gradient-gold p-5 flex items-center justify-between">
+              <div className="bg-gradient-primary p-5 flex items-center justify-between">
                 <div>
                   <h3 className="text-white font-semibold">
                     {trigger === "contact" ? "Get Venue Contact" : "Check Availability"}

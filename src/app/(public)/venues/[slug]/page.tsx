@@ -166,7 +166,7 @@ export default async function VenueDetailPage({
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-[var(--color-cream)] rounded-xl p-4">
                   <p className="text-sm text-gray-500 mb-1">Per Slot</p>
-                  <p className="text-2xl font-bold text-gradient-gold">
+                  <p className="text-2xl font-bold text-gradient-primary">
                     {formatPrice(venue.price_per_slot)}
                   </p>
                 </div>
@@ -297,7 +297,7 @@ export default async function VenueDetailPage({
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 sticky top-24">
               <div className="text-center mb-6">
                 <p className="text-sm text-gray-500 mb-1">Starting from</p>
-                <p className="text-3xl font-bold text-gradient-gold">
+                <p className="text-3xl font-bold text-gradient-primary">
                   {formatPrice(venue.price_per_slot)}
                 </p>
                 <p className="text-xs text-gray-400">per slot</p>

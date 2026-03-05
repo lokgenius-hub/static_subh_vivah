@@ -57,7 +57,7 @@ export function VenueCard({ venue, index = 0 }: VenueCardProps) {
                 e.stopPropagation();
               }}
             >
-              <Heart className="h-4 w-4 text-gray-500 group-hover/heart:text-[var(--color-accent)] transition-colors" />
+              <Heart className="h-4 w-4 text-gray-500 group-hover/heart:text-[var(--color-primary)] group-hover/heart:fill-[var(--color-primary)] transition-colors" />
             </button>
 
             {/* Bottom Price */}

@@ -196,11 +196,11 @@ export default function PartnerRegisterPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="h-10 w-10 rounded-lg bg-gradient-gold flex items-center justify-center">
+            <div className="h-10 w-10 rounded-lg bg-gradient-primary flex items-center justify-center">
               <span className="text-white font-bold text-xl">V</span>
             </div>
             <span className="text-2xl font-bold">
-              <span className="text-gradient-gold">Vivah</span>
+              <span className="text-gradient-primary">Vivah</span>
               <span className="text-[var(--color-charcoal)]">Sthal</span>
             </span>
           </Link>

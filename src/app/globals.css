@@ -2,31 +2,50 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   VivahSthal — WedMeGood-inspired Modern Design System
+   ============================================================ */
+
 :root {
-  /* Luxury gold & rose palette */
-  --color-primary: #B8860B;
-  --color-primary-light: #DAA520;
-  --color-primary-dark: #8B6914;
-  --color-accent: #C41E3A;
-  --color-accent-light: #E8425A;
-  --color-cream: #FFF8F0;
-  --color-warm-gray: #F5F0EB;
-  --color-charcoal: #1A1A2E;
-  --color-gold-gradient-start: #B8860B;
-  --color-gold-gradient-end: #DAA520;
+  /* Primary: Deep Crimson/Rose (WedMeGood signature) */
+  --color-primary: #E91E63;
+  --color-primary-light: #F06292;
+  --color-primary-dark: #C2185B;
+
+  /* Accent: Rich Gold for luxury touches */
+  --color-accent: #D4AF37;
+  --color-accent-light: #F0D060;
+
+  /* Neutrals */
+  --color-cream: #FAFAFA;
+  --color-warm-gray: #F5F5F5;
+  --color-charcoal: #212121;
+
+  /* Gradients */
+  --color-gradient-start: #E91E63;
+  --color-gradient-end: #FF5722;
+  --color-gold-gradient-start: #D4AF37;
+  --color-gold-gradient-end: #F0D060;
+
+  /* Semantic */
+  --color-success: #4CAF50;
+  --color-warning: #FF9800;
+  --color-info: #2196F3;
 }
 
-/* Luxury typography */
+/* Modern typography — clean sans-serif */
 @layer base {
   body {
     @apply antialiased;
+    font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
     font-feature-settings: "kern" 1, "liga" 1;
     background-color: var(--color-cream);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Georgia", "Times New Roman", serif;
-    letter-spacing: -0.02em;
+    font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.025em;
+    font-weight: 700;
   }
 }
 
@@ -37,19 +56,19 @@
     scrollbar-color: var(--color-primary) transparent;
   }
 
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background-color: var(--color-primary); border-radius: 3px; }
+
+  /* Gradient text — Rose */
+  .text-gradient-primary {
+    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: var(--color-primary);
-    border-radius: 3px;
-  }
-
+  /* Gold text for luxury */
   .text-gradient-gold {
     background: linear-gradient(135deg, var(--color-gold-gradient-start), var(--color-gold-gradient-end));
     -webkit-background-clip: text;
@@ -57,24 +76,34 @@
     background-clip: text;
   }
 
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+  }
+
   .bg-gradient-gold {
     background: linear-gradient(135deg, var(--color-gold-gradient-start), var(--color-gold-gradient-end));
   }
 
   .glass {
-    backdrop-filter: blur(16px) saturate(180%);
-    background-color: rgba(255, 255, 255, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(20px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.4);
   }
 
   .glass-dark {
-    backdrop-filter: blur(16px) saturate(180%);
-    background-color: rgba(26, 26, 46, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    background-color: rgba(33, 33, 33, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .section-padding {
+    @apply py-16 md:py-24 px-4 sm:px-6 lg:px-8;
   }
 }
 
-/* Animations */
+/* ============================================================
+   Animations
+   ============================================================ */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
@@ -86,31 +115,41 @@
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
 }
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(233, 30, 99, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(233, 30, 99, 0.5), 0 0 40px rgba(233, 30, 99, 0.15); }
+}
+
+.animate-float { animation: float 3s ease-in-out infinite; }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, transparent 0%, rgba(184, 134, 11, 0.1) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(233, 30, 99, 0.08) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
-}
+.animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+.animate-slide-in-right { animation: slideInRight 0.5s ease-out forwards; }
+.animate-scale-in { animation: scaleIn 0.4s ease-out forwards; }
+.animate-pulse-glow { animation: pulse-glow 2.5s ease-in-out infinite; }
 
-/* Card shine effect */
+/* ============================================================
+   Card Effects
+   ============================================================ */
 .card-shine {
   position: relative;
   overflow: hidden;
@@ -127,7 +166,7 @@
     to bottom right,
     rgba(255, 255, 255, 0) 0%,
     rgba(255, 255, 255, 0) 40%,
-    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.12) 50%,
     rgba(255, 255, 255, 0) 60%,
     rgba(255, 255, 255, 0) 100%
   );
@@ -139,17 +178,7 @@
   transform: rotate(30deg) translate(20%, 20%);
 }
 
-/* Modern UI enhancements */
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 8px rgba(184, 134, 11, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(184, 134, 11, 0.5), 0 0 40px rgba(184, 134, 11, 0.15); }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2.5s ease-in-out infinite;
-}
-
-/* Gradient border effect */
+/* Gradient border (hover reveal) */
 .gradient-border {
   position: relative;
   background: white;
@@ -162,7 +191,7 @@
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, var(--color-gold-gradient-start), var(--color-accent), var(--color-gold-gradient-end));
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent), var(--color-primary-light));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -175,19 +204,53 @@
   opacity: 1;
 }
 
-/* Smooth text reveal */
 @keyframes text-reveal {
   from { clip-path: inset(0 100% 0 0); }
   to   { clip-path: inset(0 0 0 0); }
 }
 
-.animate-text-reveal {
-  animation: text-reveal 0.8s ease-out forwards;
-}
+.animate-text-reveal { animation: text-reveal 0.8s ease-out forwards; }
 
 /* Modern focus ring */
 *:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* WedMeGood-style category cards */
+.category-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Ribbon badge */
+.ribbon {
+  position: absolute;
+  top: 12px;
+  left: -6px;
+  padding: 4px 12px 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  background: var(--color-primary);
+  clip-path: polygon(0 0, 100% 0, 95% 50%, 100% 100%, 0 100%, 5% 50%);
+}
+
+/* Venue image overlay */
+.venue-image-overlay {
+  position: relative;
+  overflow: hidden;
+}
+
+.venue-image-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
+  pointer-events: none;
 }

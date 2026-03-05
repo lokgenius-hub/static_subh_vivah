@@ -220,7 +220,7 @@ export function PricingCards({ packages }: { packages: MarriagePackage[] }) {
             </span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold text-[var(--color-charcoal)] mb-4">
-            Choose Your <span className="text-gradient-gold">Dream Package</span>
+            Choose Your <span className="text-gradient-primary">Dream Package</span>
           </h2>
           <p className="text-gray-500 max-w-2xl mx-auto">
             Complete wedding solutions designed for Bhabua, Sasaram &amp; Kaimur region. Every package

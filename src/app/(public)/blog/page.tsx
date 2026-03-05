@@ -28,7 +28,7 @@ export default async function BlogPage() {
           </span>
         </div>
         <h1 className="text-4xl sm:text-5xl font-bold mb-3">
-          Wedding <span className="text-gradient-gold">Inspiration</span>
+          Wedding <span className="text-gradient-primary">Inspiration</span>
         </h1>
         <p className="text-gray-400 max-w-xl mx-auto text-sm">
           Tips, guides and expert advice for planning your dream celebration across Bihar and India.

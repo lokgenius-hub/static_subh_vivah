@@ -18,7 +18,7 @@ export default function EnquiryPage() {
             We&apos;re Here to Help
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold mb-4">
-            Send <span className="text-gradient-gold">Enquiry</span>
+            Send <span className="text-gradient-primary">Enquiry</span>
           </h1>
           <p className="text-gray-300 max-w-xl mx-auto">
             Tell us about your dream wedding and we&apos;ll get back to you within 30 minutes

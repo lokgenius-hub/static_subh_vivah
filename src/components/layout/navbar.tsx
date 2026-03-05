@@ -3,19 +3,23 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, User, Search, LogOut, LayoutDashboard, ChevronDown, Loader2 } from "lucide-react";
+import {
+  Menu, X, User, Search, LogOut, LayoutDashboard,
+  ChevronDown, Loader2, Heart, MapPin, Camera,
+  Star, BookOpen, Phone
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { clearSupabaseSession } from "@/lib/auth-helpers";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const navLinks = [
-  { href: "/venues", label: "Venues" },
-  { href: "/packages", label: "Packages" },
-  { href: "/testimonials", label: "Testimonials" },
-  { href: "/stories", label: "Success Stories" },
-  { href: "/blog", label: "Blog" },
-  { href: "/about", label: "About" },
+  { href: "/venues", label: "Venues", icon: MapPin },
+  { href: "/destination-weddings", label: "Destinations", icon: Star },
+  { href: "/packages", label: "Packages", icon: Heart },
+  { href: "/stories", label: "Real Weddings", icon: Camera },
+  { href: "/blog", label: "Blog", icon: BookOpen },
+  { href: "/about", label: "About", icon: Phone },
 ];
 
 function getDashboardHref(role?: string) {
@@ -97,28 +101,45 @@ export function Navbar() {
   const effectiveRole = role ?? (user?.user_metadata?.role as string | undefined);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+      {/* Top bar — WedMeGood style */}
+      <div className="bg-[var(--color-charcoal)] text-white text-xs py-1.5 hidden sm:block">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <span className="text-gray-300">Best Wedding Venues in Bhabua, Sasaram &amp; Kaimur District</span>
+          <div className="flex items-center gap-4">
+            <Link href="/enquiry" className="hover:text-[var(--color-primary-light)] transition-colors">Send Enquiry</Link>
+            <Link href="/destination-weddings" className="hover:text-[var(--color-primary-light)] transition-colors">Destination Weddings</Link>
+            <span className="text-gray-500">|</span>
+            <a href="tel:+918000000000" className="hover:text-[var(--color-primary-light)] transition-colors flex items-center gap-1">
+              <Phone className="h-3 w-3" /> Call Us
+            </a>
+          </div>
+        </div>
+      </div>
+
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-gold shadow-md">
-              <span className="text-white font-bold text-lg">V</span>
-              <div className="absolute inset-0 rounded-lg bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary shadow-md">
+              <span className="text-white font-bold text-xl">V</span>
             </div>
-            <span className="text-xl font-bold tracking-tight">
-              <span className="text-gradient-gold">Vivah</span>
-              <span className="text-[var(--color-charcoal)]">Sthal</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="text-xl font-extrabold tracking-tight leading-none">
+                <span className="text-gradient-primary">Vivah</span>
+                <span className="text-[var(--color-charcoal)]">Sthal</span>
+              </span>
+              <span className="text-[9px] text-gray-400 font-medium tracking-wider uppercase">Kaimur &middot; Sasaram &middot; Bhabua</span>
+            </div>
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-gray-600 hover:text-[var(--color-primary)] transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-gradient-gold after:transition-all hover:after:w-full"
+                className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-[var(--color-primary)] transition-colors rounded-lg hover:bg-[var(--color-primary)]/5"
               >
                 {link.label}
               </Link>
@@ -126,11 +147,9 @@ export function Navbar() {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3">
-            <Link href="/venues">
-              <Button variant="ghost" size="icon">
-                <Search className="h-4 w-4" />
-              </Button>
+          <div className="hidden lg:flex items-center gap-2.5">
+            <Link href="/venues" className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-[var(--color-primary)]">
+              <Search className="h-4 w-4" />
             </Link>
 
             {user ? (
@@ -138,9 +157,9 @@ export function Navbar() {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 hover:border-[var(--color-primary)] bg-white hover:bg-[var(--color-primary)]/5 transition-colors text-sm font-medium text-gray-700"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 hover:border-[var(--color-primary)] bg-white hover:bg-pink-50 transition-colors text-sm font-medium text-gray-700"
                 >
-                  <div className="h-6 w-6 rounded-full bg-gradient-gold flex items-center justify-center text-white text-xs font-bold uppercase">
+                  <div className="h-7 w-7 rounded-full bg-gradient-primary flex items-center justify-center text-white text-xs font-bold uppercase">
                     {displayName[0]}
                   </div>
                   <span className="max-w-[120px] truncate">{displayName}</span>
@@ -241,12 +260,17 @@ export function Navbar() {
           </div>
 
           {/* Mobile Toggle */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <div className="lg:hidden flex items-center gap-2">
+            <Link href="/venues" className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500">
+              <Search className="h-5 w-5" />
+            </Link>
+            <button
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -257,7 +281,7 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass border-t border-gray-200/50 overflow-hidden"
+            className="lg:hidden bg-white border-t border-gray-100 overflow-hidden shadow-lg"
           >
             <div className="px-4 py-4 space-y-3">
               {navLinks.map((link) => (

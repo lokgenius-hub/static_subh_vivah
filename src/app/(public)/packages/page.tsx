@@ -39,7 +39,7 @@ export default function PricingPage() {
             Transparent Pricing
           </p>
           <h1 className="text-4xl sm:text-6xl font-extrabold mb-4">
-            Wedding <span className="text-gradient-gold">Packages</span>
+            Wedding <span className="text-gradient-primary">Packages</span>
           </h1>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto">
             All-inclusive marriage packages designed for Bhabua, Sasaram &amp; the Kaimur region.
@@ -63,7 +63,7 @@ export default function PricingPage() {
               { num: "24/7", label: "Support Available" },
             ].map(({ num, label }) => (
               <div key={label}>
-                <p className="text-2xl font-bold text-gradient-gold">{num}</p>
+                <p className="text-2xl font-bold text-gradient-primary">{num}</p>
                 <p className="text-sm text-gray-500 mt-1">{label}</p>
               </div>
             ))}

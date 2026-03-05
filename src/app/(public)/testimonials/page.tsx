@@ -33,7 +33,7 @@ export default function TestimonialsPage() {
             Real Stories, Real Love
           </p>
           <h1 className="text-4xl sm:text-6xl font-extrabold mb-4">
-            What Couples <span className="text-gradient-gold">Say</span>
+            What Couples <span className="text-gradient-primary">Say</span>
           </h1>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto">
             Hear from families who found their perfect wedding venue through VivahSthal

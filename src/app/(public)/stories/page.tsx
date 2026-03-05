@@ -33,7 +33,7 @@ export default function SuccessStoriesPage() {
             Real Weddings, Real Joy
           </p>
           <h1 className="text-4xl sm:text-6xl font-extrabold mb-4">
-            Success <span className="text-gradient-gold">Stories</span>
+            Success <span className="text-gradient-primary">Stories</span>
           </h1>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto">
             Every wedding we help plan becomes a beautiful story. Read about real couples

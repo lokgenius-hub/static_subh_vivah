@@ -484,19 +484,19 @@ export async function createLead(formData: FormData) {
     .select()
     .single();
 
-  // If columns don't match, try with migration schema column names
-  if (error?.code === "PGRST204") {
+  // If columns don't match, retry without optional columns
+  if (error?.code === "PGRST204" || error?.message?.includes("schema cache")) {
     const altData: Record<string, unknown> = {
       venue_id: isValidUUID ? rawVenueId : null,
-      name: formData.get("customer_name") as string,
-      email: formData.get("customer_email") as string,
-      phone: formData.get("customer_phone") as string,
+      customer_name: formData.get("customer_name") as string,
+      customer_email: formData.get("customer_email") as string,
+      customer_phone: formData.get("customer_phone") as string,
       event_date: formData.get("event_date") as string || null,
       guest_count: formData.get("guest_count") ? parseInt(formData.get("guest_count") as string) : null,
       message: formData.get("message") as string || null,
       status: "new",
     };
-    if (user) altData.user_id = user.id;
+    if (user) altData.customer_id = user.id;
 
     ({ data, error } = await serviceClient
       .from("leads")
@@ -761,11 +761,11 @@ export async function updateVenueSlot(
 // ============================================================
 
 export async function getLeads(status?: string) {
-  const supabase = await createClient();
+  const serviceClient = await createServiceClient();
 
-  let query = supabase
+  let query = serviceClient
     .from("leads")
-    .select("*, venue:venues(name, city), customer:profiles!leads_customer_id_fkey(full_name, phone)")
+    .select("*, venue:venues!leads_venue_id_fkey(name, city)")
     .order("created_at", { ascending: false });
 
   if (status && status !== "all") {

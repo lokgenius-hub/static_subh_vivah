@@ -33,7 +33,7 @@ function TestimonialCard({ t, index }: { t: Testimonial; index: number }) {
 
       {/* Avatar + Info */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="h-14 w-14 rounded-full bg-gradient-gold flex items-center justify-center text-white font-bold text-lg shrink-0">
+        <div className="h-14 w-14 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold text-lg shrink-0">
           {initials}
         </div>
         <div>
@@ -89,7 +89,7 @@ export function TestimonialsList({ testimonials }: { testimonials: Testimonial[]
               className="text-center p-4 rounded-2xl bg-white shadow-sm border border-gray-100"
             >
               <Icon className="h-5 w-5 text-[var(--color-primary)] mx-auto mb-2" />
-              <p className="text-xl font-bold text-gradient-gold">{num}</p>
+              <p className="text-xl font-bold text-gradient-primary">{num}</p>
               <p className="text-xs text-gray-500">{label}</p>
             </motion.div>
           ))}
@@ -181,7 +181,7 @@ function FeedbackForm() {
             Share Your Experience
           </p>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[var(--color-charcoal)]">
-            Tell Us About Your <span className="text-gradient-gold">Wedding</span>
+            Tell Us About Your <span className="text-gradient-primary">Wedding</span>
           </h2>
           <p className="mt-3 text-gray-500 max-w-lg mx-auto">
             Your feedback helps other couples find their perfect venue. Submit a review and it will be

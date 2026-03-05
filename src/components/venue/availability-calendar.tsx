@@ -172,7 +172,7 @@ export function AvailabilityCalendar({ venueId, venueName, vendorPhone, vendorNa
               className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
             >
               {/* Header */}
-              <div className="bg-gradient-gold px-5 py-4 flex items-center justify-between">
+              <div className="bg-gradient-primary px-5 py-4 flex items-center justify-between">
                 <div>
                   <p className="text-white/70 text-xs">Selected Date</p>
                   <p className="text-white font-bold text-lg">{format(selectedDate, "EEEE, d MMMM yyyy")}</p>

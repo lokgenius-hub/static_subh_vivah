@@ -1,7 +1,7 @@
 import { getFeaturedVenues } from "@/lib/actions";
 import { VenueCard } from "@/components/venue/venue-card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Crown } from "lucide-react";
+import { ArrowRight, Heart } from "lucide-react";
 import Link from "next/link";
 
 export async function FeaturedVenues() {
@@ -189,22 +189,23 @@ export async function FeaturedVenues() {
         ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="section-padding bg-gray-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-12">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Crown className="h-5 w-5 text-[var(--color-primary)]" />
-              <span className="text-sm font-medium text-[var(--color-primary)] uppercase tracking-wider">
+              <Heart className="h-5 w-5 text-[var(--color-primary)] fill-[var(--color-primary)]/30" />
+              <span className="text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">
                 Handpicked for You
               </span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[var(--color-charcoal)]">
-              Featured <span className="text-gradient-gold">Venues</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[var(--color-charcoal)]">
+              Featured <span className="text-gradient-primary">Venues</span>
             </h2>
+            <p className="mt-2 text-gray-500">Top-rated wedding venues in Kaimur &amp; Rohtas district</p>
           </div>
           <Link href="/venues" className="hidden sm:block">
-            <Button variant="outline">
+            <Button variant="outline" className="border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white">
               View All <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
@@ -218,7 +219,7 @@ export async function FeaturedVenues() {
 
         <div className="mt-10 text-center sm:hidden">
           <Link href="/venues">
-            <Button variant="outline">
+            <Button className="bg-gradient-primary text-white shadow-lg">
               View All Venues <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>

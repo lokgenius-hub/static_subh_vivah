@@ -18,11 +18,11 @@ export default async function VenuesPage({
       {/* Header */}
       <div className="bg-gradient-to-b from-[var(--color-charcoal)] to-[var(--color-charcoal)]/90 pt-12 pb-8 px-4">
         <div className="mx-auto max-w-7xl">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Find Your Perfect <span className="text-gradient-gold">Venue</span>
+          <h1 className="text-3xl font-extrabold text-white mb-2">
+            Find Your Perfect <span className="text-gradient-primary">Venue</span>
           </h1>
           <p className="text-gray-400 mb-6">
-            Browse from 500+ handpicked wedding venues across India
+            Browse 20+ verified wedding venues in Bhabua, Sasaram &amp; Kaimur
           </p>
           <Suspense fallback={<div className="h-14 bg-white/10 rounded-2xl animate-pulse" />}>
             <SearchFilters variant="hero" />
