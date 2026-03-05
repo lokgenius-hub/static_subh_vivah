@@ -106,8 +106,15 @@ export default async function AdminUsersPage({
                   <tr key={user.id as string} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-full bg-gradient-gold flex items-center justify-center text-white text-sm font-bold uppercase shrink-0">
-                          {((user.full_name as string) || "U")[0]}
+                        <div className="h-9 w-9 rounded-full overflow-hidden shrink-0">
+                          {(user.avatar_url as string | null) ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={user.avatar_url as string} alt="" className="h-9 w-9 object-cover" />
+                          ) : (
+                            <div className="h-9 w-9 rounded-full bg-gradient-gold flex items-center justify-center text-white text-sm font-bold uppercase">
+                              {((user.full_name as string) || "U")[0]}
+                            </div>
+                          )}
                         </div>
                         <div>
                           <p className="font-medium text-sm">{user.full_name as string}</p>
@@ -143,7 +150,14 @@ export default async function AdminUsersPage({
                       </span>
                     </td>
                     <td className="px-4 py-4">
-                      <UserRoleActions userId={user.id as string} currentRole={user.role as string} />
+                      <UserRoleActions
+                        userId={user.id as string}
+                        currentRole={user.role as string}
+                        fullName={(user.full_name as string) || ""}
+                        phone={(user.phone as string) || ""}
+                        city={(user.city as string) || ""}
+                        avatarUrl={(user.avatar_url as string) || ""}
+                      />
                     </td>
                   </tr>
                 ))}

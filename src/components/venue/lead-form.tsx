@@ -160,9 +160,9 @@ export function LeadForm({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden"
             >
-              <div className="bg-gradient-primary p-5 flex items-center justify-between">
+              <div className="bg-gradient-primary p-5 flex items-center justify-between shrink-0">
                 <div>
                   <h3 className="text-white font-semibold">
                     {trigger === "contact" ? "Get Venue Contact" : "Check Availability"}
@@ -176,7 +176,7 @@ export function LeadForm({
                   <X className="h-4 w-4 text-white" />
                 </button>
               </div>
-              <div className="p-6">
+              <div className="p-6 overflow-y-auto flex-1">
                 <EnquiryForm
                   venueId={venueId}
                   venueName={venueName}

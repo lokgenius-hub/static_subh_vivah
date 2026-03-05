@@ -970,6 +970,30 @@ export async function adminSetUserPassword(userId: string, newPassword: string) 
   return { success: true };
 }
 
+export async function adminUpdateUserProfile(
+  userId: string,
+  data: { full_name?: string; phone?: string; city?: string; avatar_url?: string }
+) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const serviceClient = await createServiceClient();
+  const { data: profile } = await serviceClient.from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "admin") return { success: false, error: "Admin access required" };
+
+  const update: Record<string, unknown> = {};
+  if (data.full_name !== undefined) update.full_name = data.full_name;
+  if (data.phone !== undefined) update.phone = data.phone;
+  if (data.city !== undefined) update.city = data.city;
+  if (data.avatar_url !== undefined) update.avatar_url = data.avatar_url;
+
+  const { error } = await serviceClient.from("profiles").update(update).eq("id", userId);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/admin/users");
+  return { success: true };
+}
+
 // ============================================================
 // PARTNER: PROFILE MANAGEMENT
 // ============================================================
