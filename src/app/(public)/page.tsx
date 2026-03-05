@@ -7,8 +7,11 @@ import { Stats } from "./sections/stats";
 import { Testimonials } from "./sections/testimonials";
 import { CTASection } from "./sections/cta";
 import { PricingPreview } from "./sections/pricing-preview";
+import { getTestimonials } from "@/lib/actions";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const testimonials = await getTestimonials(true);
+
   return (
     <>
       <HeroSection />
@@ -19,7 +22,7 @@ export default function HomePage() {
       <VenueTypes />
       <PricingPreview />
       <HowItWorks />
-      <Testimonials />
+      <Testimonials testimonials={testimonials} />
       <CTASection />
     </>
   );
