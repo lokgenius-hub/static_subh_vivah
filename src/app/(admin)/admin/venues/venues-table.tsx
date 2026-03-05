@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Building2, MapPin, Users, Star, IndianRupee } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { VenueAdminActions, VenueEditDrawer } from "./venue-admin-actions";
@@ -111,15 +111,30 @@ export function AdminVenuesTable({ venues }: { venues: VenueRow[] }) {
         </table>
       </div>
 
-      {/* Edit drawer below the table */}
+      {/* Fixed full-screen edit modal */}
       <AnimatePresence>
         {editingVenue && (
-          <div className="px-4 pb-6">
-            <VenueEditDrawer
-              venue={editingVenue}
-              onClose={() => setEditingId(null)}
-            />
-          </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[80] bg-black/50 flex items-start justify-center p-4 overflow-y-auto"
+            onClick={() => setEditingId(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.97 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-3xl my-8"
+            >
+              <VenueEditDrawer
+                venue={editingVenue}
+                onClose={() => setEditingId(null)}
+              />
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

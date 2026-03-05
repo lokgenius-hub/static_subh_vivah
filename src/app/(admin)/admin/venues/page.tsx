@@ -68,7 +68,7 @@ export default async function AdminVenuesPage({
         </form>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
         <AdminVenuesTable venues={venues as (Venue & { vendor?: { full_name?: string; email?: string } | null })[]} />
       </div>
     </div>

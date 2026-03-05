@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { toggleVenueStatus, toggleVenueFeatured, deleteVenue, updateVenue } from "@/lib/actions";
 import { Eye, EyeOff, Star, StarOff, Trash2, Loader2, Pencil, X, CheckCircle2 } from "lucide-react";
 import { VenueForm, type VenueFormSubmitArgs } from "@/components/venue/venue-form";
@@ -119,11 +118,8 @@ export function VenueEditDrawer({ venue, onClose }: { venue: Venue; onClose: () 
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 8 }}
-      className="mt-4 bg-white rounded-2xl border border-pink-200 shadow-lg overflow-hidden"
+    <div
+      className="bg-white rounded-2xl border border-pink-200 shadow-lg overflow-hidden"
     >
       <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-pink-50 to-white border-b border-pink-100">
         <div>
@@ -152,6 +148,6 @@ export function VenueEditDrawer({ venue, onClose }: { venue: Venue; onClose: () 
           submitLabel="Save All Changes"
         />
       </div>
-    </motion.div>
+    </div>
   );
 }
