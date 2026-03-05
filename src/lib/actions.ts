@@ -3,22 +3,19 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { Lead, Venue, VenueSlot, VenueSearchParams, BlogPost, EnquiryInbox, MarriagePackage, Testimonial, SuccessStory } from "@/lib/types";
-import { sendVendorEnquiryEmail, sendOtpEmail } from "@/lib/email";
+import { sendOtpEmail } from "@/lib/email";
+import { sendAllNotifications, type EnquiryData } from "@/lib/notifications";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 // In-memory OTP store (for dev — in production use Redis or DB)
 const otpStore = new Map<string, { otp: string; expiresAt: number; name: string; phone: string; role: string }>();
 
 // ============================================================
-// VENDOR EMAIL NOTIFICATION (fire-and-forget)
+// NOTIFICATION + ENQUIRY INBOX SAVE (fire-and-forget)
 // ============================================================
 
-const SUPER_ADMIN_EMAIL = "admin@vivahsthal.com";
-const SUPER_ADMIN_WHATSAPP = "918000000000"; // Replace with actual
-
-async function notifyVendorByEmail(
+async function notifyAndSaveEnquiry(
   serviceClient: SupabaseClient,
-  venueId: string,
   lead: {
     customerName: string;
     customerPhone: string;
@@ -29,59 +26,60 @@ async function notifyVendorByEmail(
     budgetRange?: string;
     message?: string;
   },
+  venueId?: string | null,
   leadId?: string
 ) {
-  const { data: venue } = await serviceClient
-    .from("venues")
-    .select("name, vendor_id")
-    .eq("id", venueId)
-    .single();
+  let venueName: string | undefined;
+  let vendorId: string | undefined;
+  let vendorName: string | undefined;
+  let vendorEmail: string | undefined;
 
-  if (!venue?.vendor_id) return;
+  // Fetch venue + vendor info if venue_id is provided
+  if (venueId) {
+    const { data: venue } = await serviceClient
+      .from("venues")
+      .select("name, vendor_id")
+      .eq("id", venueId)
+      .single();
 
-  const { data: vendor } = await serviceClient
-    .from("profiles")
-    .select("full_name, email, phone")
-    .eq("id", venue.vendor_id)
-    .single();
+    if (venue) {
+      venueName = venue.name;
+      vendorId = venue.vendor_id;
 
-  if (!vendor?.email) return;
+      if (venue.vendor_id) {
+        const { data: vendor } = await serviceClient
+          .from("profiles")
+          .select("full_name, email, phone")
+          .eq("id", venue.vendor_id)
+          .single();
 
-  // 1. Send email to vendor
-  await sendVendorEnquiryEmail({
-    vendorEmail: vendor.email,
-    vendorName: vendor.full_name || "Vendor",
+        if (vendor) {
+          vendorName = vendor.full_name || undefined;
+          vendorEmail = vendor.email || undefined;
+        }
+      }
+    }
+  }
+
+  const enquiryData: EnquiryData = {
     customerName: lead.customerName,
     customerPhone: lead.customerPhone,
     customerEmail: lead.customerEmail,
-    venueName: venue.name,
+    venueName,
+    vendorName,
+    vendorEmail,
     eventDate: lead.eventDate,
     guestCount: lead.guestCount,
     slotPreference: lead.slotPreference,
     budgetRange: lead.budgetRange,
     message: lead.message,
-  });
+  };
 
-  // 2. Send email to super admin
-  await sendVendorEnquiryEmail({
-    vendorEmail: SUPER_ADMIN_EMAIL,
-    vendorName: "Super Admin",
-    customerName: lead.customerName,
-    customerPhone: lead.customerPhone,
-    customerEmail: lead.customerEmail,
-    venueName: venue.name,
-    eventDate: lead.eventDate,
-    guestCount: lead.guestCount,
-    slotPreference: lead.slotPreference,
-    budgetRange: lead.budgetRange,
-    message: `[Vendor: ${vendor.full_name}] ${lead.message || ""}`,
-  });
-
-  // 3. Save to enquiry inbox
-  await serviceClient.from("enquiry_inbox").insert({
+  // 1. Save to enquiry_inbox (ALWAYS, even without venue)
+  const { error: inboxError } = await serviceClient.from("enquiry_inbox").insert({
     lead_id: leadId || null,
-    venue_id: venueId,
-    vendor_id: venue.vendor_id,
+    venue_id: venueId || null,
+    vendor_id: vendorId || null,
     customer_name: lead.customerName,
     customer_phone: lead.customerPhone,
     customer_email: lead.customerEmail || null,
@@ -93,17 +91,15 @@ async function notifyVendorByEmail(
     source: "website",
   });
 
-  // 4. WhatsApp notification links (auto-compose messages)
-  // These are logged; in production, integrate with WhatsApp Business API
-  const whatsappMsg = encodeURIComponent(
-    `🎊 New Enquiry for ${venue.name}!\n\nCustomer: ${lead.customerName}\nPhone: ${lead.customerPhone}\n${lead.eventDate ? `Date: ${lead.eventDate}\n` : ""}${lead.guestCount ? `Guests: ${lead.guestCount}\n` : ""}${lead.message ? `Message: ${lead.message}` : ""}`
-  );
-
-  // Log WhatsApp links (vendor phone & super admin)
-  if (vendor.phone) {
-    console.log(`WhatsApp Vendor: https://wa.me/${vendor.phone.replace(/\D/g, "")}?text=${whatsappMsg}`);
+  if (inboxError) {
+    console.error("[Enquiry Inbox] Save failed:", inboxError.message);
+  } else {
+    console.log("[Enquiry Inbox] Saved successfully");
   }
-  console.log(`WhatsApp Admin: https://wa.me/${SUPER_ADMIN_WHATSAPP}?text=${whatsappMsg}`);
+
+  // 2. Send ALL notifications (admin email, vendor email, customer auto-reply, WhatsApp)
+  const results = await sendAllNotifications(enquiryData, { skipVendor: !vendorEmail });
+  console.log("[Notifications]", results);
 }
 
 // ============================================================
@@ -510,19 +506,17 @@ export async function createLead(formData: FormData) {
     return { success: false, error: error.message };
   }
 
-  // Send email notification to vendor + super admin (fire-and-forget, don't block the response)
-  if (isValidUUID && rawVenueId) {
-    notifyVendorByEmail(serviceClient, rawVenueId, {
-      customerName: formData.get("customer_name") as string,
-      customerPhone: formData.get("customer_phone") as string,
-      customerEmail: (formData.get("customer_email") as string) || undefined,
-      eventDate: (formData.get("event_date") as string) || undefined,
-      guestCount: formData.get("guest_count") ? parseInt(formData.get("guest_count") as string) : undefined,
-      slotPreference: (formData.get("slot_preference") as string) || undefined,
-      budgetRange: (formData.get("budget_range") as string) || undefined,
-      message: (formData.get("message") as string) || undefined,
-    }, data?.id).catch((err) => console.error("Vendor email notification failed:", err));
-  }
+  // Send ALL notifications + save to enquiry inbox (fire-and-forget, never block response)
+  notifyAndSaveEnquiry(serviceClient, {
+    customerName: formData.get("customer_name") as string,
+    customerPhone: formData.get("customer_phone") as string,
+    customerEmail: (formData.get("customer_email") as string) || undefined,
+    eventDate: (formData.get("event_date") as string) || undefined,
+    guestCount: formData.get("guest_count") ? parseInt(formData.get("guest_count") as string) : undefined,
+    slotPreference: (formData.get("slot_preference") as string) || undefined,
+    budgetRange: (formData.get("budget_range") as string) || undefined,
+    message: (formData.get("message") as string) || undefined,
+  }, isValidUUID ? rawVenueId : null, data?.id).catch((err) => console.error("Notification failed:", err));
 
   revalidatePath("/admin/leads");
   return { success: true, lead: data };
@@ -553,6 +547,16 @@ export async function createLeadFromAI(leadInfo: {
     console.error("AI lead creation error:", error);
     return { success: false, error: error.message };
   }
+
+  // Send notifications + save to inbox (fire-and-forget)
+  notifyAndSaveEnquiry(serviceClient, {
+    customerName: leadInfo.customer_name,
+    customerPhone: leadInfo.customer_phone,
+    customerEmail: leadInfo.customer_email,
+    eventDate: leadInfo.event_date,
+    guestCount: leadInfo.guest_count,
+    message: leadInfo.message ? `[AI Chatbot] ${leadInfo.message}` : "[AI Chatbot Enquiry]",
+  }, leadInfo.venue_id || null, data?.id).catch((err) => console.error("AI notification failed:", err));
 
   return { success: true, lead: data };
 }
@@ -1034,7 +1038,7 @@ export async function getBlogPosts(publishedOnly = true): Promise<BlogPost[]> {
   const supabase = await createServiceClient();
   let query = supabase
     .from("blog_posts")
-    .select("*, author:author_id(id, full_name, avatar_url)")
+    .select("*, author:author_id(id, full_name)")
     .order("published_at", { ascending: false });
 
   if (publishedOnly) query = query.eq("is_published", true);
@@ -1048,7 +1052,7 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
   const supabase = await createServiceClient();
   const { data, error } = await supabase
     .from("blog_posts")
-    .select("*, author:author_id(id, full_name, avatar_url)")
+    .select("*, author:author_id(id, full_name)")
     .eq("slug", slug)
     .single();
   if (error) return null;
