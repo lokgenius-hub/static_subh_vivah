@@ -101,6 +101,8 @@ function VenueForm({
           required
         />
         <Input name="pincode" label="Pincode" placeholder="e.g. 821101" defaultValue={initial?.pincode ?? ""} />
+        <Input name="latitude" label="Latitude (Google Maps)" type="number" step="any" placeholder="e.g. 25.0392" defaultValue={initial?.latitude?.toString() ?? ""} />
+        <Input name="longitude" label="Longitude (Google Maps)" type="number" step="any" placeholder="e.g. 83.6082" defaultValue={initial?.longitude?.toString() ?? ""} />
         <Input name="capacity_min" label="Min Capacity" type="number" placeholder="50" defaultValue={initial?.capacity_min?.toString()} />
         <Input name="capacity_max" label="Max Capacity" type="number" placeholder="500" defaultValue={initial?.capacity_max?.toString()} />
         <Input

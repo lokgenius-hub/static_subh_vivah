@@ -138,3 +138,56 @@
 .card-shine:hover::after {
   transform: rotate(30deg) translate(20%, 20%);
 }
+
+/* Modern UI enhancements */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(184, 134, 11, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(184, 134, 11, 0.5), 0 0 40px rgba(184, 134, 11, 0.15); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+/* Gradient border effect */
+.gradient-border {
+  position: relative;
+  background: white;
+  border-radius: 1rem;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--color-gold-gradient-start), var(--color-accent), var(--color-gold-gradient-end));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gradient-border:hover::before {
+  opacity: 1;
+}
+
+/* Smooth text reveal */
+@keyframes text-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+.animate-text-reveal {
+  animation: text-reveal 0.8s ease-out forwards;
+}
+
+/* Modern focus ring */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

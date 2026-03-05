@@ -86,15 +86,15 @@ export function HeroSection() {
           className="flex items-center justify-center gap-8 mt-12 text-white/70 text-sm"
         >
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-green-400" />
-            500+ Venues Listed
+            <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+            20+ Venues in Bhabua
           </div>
           <div className="hidden sm:flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-amber-400" />
+            <div className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
             Real-time Availability
           </div>
           <div className="hidden md:flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-rose-400" />
+            <div className="h-2 w-2 rounded-full bg-rose-400 animate-pulse" />
             AI-Powered Search
           </div>
         </motion.div>

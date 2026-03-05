@@ -10,22 +10,23 @@ import {
   Car, UtensilsCrossed, Music, Camera, Shield,
   Instagram, Facebook, Twitter, Youtube, Phone,
 } from "lucide-react";
+import { VenueMap } from "@/components/venue/venue-map";
 
 // Demo venue for when the DB is empty
 const demoVenue = {
   id: "1",
   vendor_id: "v1",
-  name: "Royal Palace Banquet Hall",
-  slug: "royal-palace-banquet",
+  name: "Kaimur Palace Banquet Hall",
+  slug: "kaimur-palace-banquet",
   description:
-    "Step into the grandeur of Royal Palace Banquet Hall — a stunning blend of regal architecture and modern amenities. With ornate chandeliers, marble flooring, and impeccable service, this venue transforms your wedding into a royal celebration. Our dedicated team ensures every detail is perfect, from the mandap setup to the reception décor. Featuring spacious halls, lush lawns, and state-of-the-art sound systems, Royal Palace is where dreams become memories.",
+    "Step into the grandeur of Kaimur Palace Banquet Hall — a stunning blend of regal architecture and modern amenities in the heart of Bhabua. With ornate chandeliers, marble flooring, and impeccable service, this venue transforms your wedding into a royal celebration. Our dedicated team ensures every detail is perfect, from the mandap setup to the reception décor. Featuring spacious halls, lush lawns, and state-of-the-art sound systems, Kaimur Palace is where dreams become memories.",
   venue_type: "banquet_hall" as const,
-  city: "Patna",
+  city: "Bhabua",
   state: "Bihar",
-  address: "Exhibition Rd, Near Gandhi Maidan, Patna 800001",
-  pincode: "800001",
-  latitude: null,
-  longitude: null,
+  address: "Station Road, Bhabua, Kaimur 821101",
+  pincode: "821101",
+  latitude: 25.0392,
+  longitude: 83.6082,
   capacity_min: 100,
   capacity_max: 800,
   price_per_slot: 250000,
@@ -83,7 +84,7 @@ export default async function VenueDetailPage({
 
   // Fallback to demo if DB is empty
   if (!venue) {
-    if (slug === "royal-palace-banquet") {
+    if (slug === "kaimur-palace-banquet") {
       venue = demoVenue;
     } else {
       notFound();
@@ -275,6 +276,13 @@ export default async function VenueDetailPage({
             )}
 
             {/* Availability Calendar */}
+            <VenueMap
+              latitude={venue.latitude ?? null}
+              longitude={venue.longitude ?? null}
+              venueName={venue.name}
+              address={venue.address}
+            />
+
             <AvailabilityCalendar
               venueId={venue.id}
               venueName={venue.name}

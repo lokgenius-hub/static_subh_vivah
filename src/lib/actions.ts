@@ -623,6 +623,11 @@ export async function updateVenue(venueId: string, formData: FormData) {
   if (price_slot) updates.price_per_slot = parseFloat(price_slot as string);
   if (price_plate) updates.price_per_plate = parseFloat(price_plate as string);
 
+  const latRaw = formData.get("latitude") as string | null;
+  const lngRaw = formData.get("longitude") as string | null;
+  if (latRaw) updates.latitude = parseFloat(latRaw);
+  if (lngRaw) updates.longitude = parseFloat(lngRaw);
+
   const amenitiesRaw = formData.get("amenities") as string | null;
   if (amenitiesRaw) updates.amenities = JSON.parse(amenitiesRaw);
 
@@ -670,6 +675,9 @@ export async function createVenue(formData: FormData) {
   const images: string[] = imagesRaw ? JSON.parse(imagesRaw) : [];
   const coverImage = (formData.get("cover_image") as string | null) || images[0] || null;
 
+  const latRaw = formData.get("latitude") as string | null;
+  const lngRaw = formData.get("longitude") as string | null;
+
   const venueData = {
     vendor_id: user.id,
     name: formData.get("name") as string,
@@ -683,6 +691,8 @@ export async function createVenue(formData: FormData) {
     state: formData.get("state") as string || "Bihar",
     address: formData.get("address") as string,
     pincode: formData.get("pincode") as string,
+    latitude: latRaw ? parseFloat(latRaw) : null,
+    longitude: lngRaw ? parseFloat(lngRaw) : null,
     capacity_min: parseInt(formData.get("capacity_min") as string) || 50,
     capacity_max: parseInt(formData.get("capacity_max") as string) || 500,
     price_per_slot: parseFloat(formData.get("price_per_slot") as string) || 0,
@@ -1311,4 +1321,56 @@ export async function getSuccessStoryBySlug(slug: string): Promise<SuccessStory 
     .single();
   if (error) return null;
   return data as SuccessStory;
+}
+
+// ============================================================
+// SUBMIT TESTIMONIAL (Public — auto-publishes)
+// ============================================================
+
+export async function submitTestimonial(formData: FormData) {
+  "use server";
+  const svc = await createServiceClient();
+
+  const coupleName = (formData.get("couple_name") as string)?.trim();
+  const location   = (formData.get("location") as string)?.trim();
+  const venueName  = (formData.get("venue_name") as string)?.trim() || null;
+  const ratingStr  = formData.get("rating") as string;
+  const text       = (formData.get("text") as string)?.trim();
+
+  if (!coupleName || !location || !text || !ratingStr) {
+    return { success: false, message: "Please fill in all required fields." };
+  }
+
+  const rating = parseInt(ratingStr, 10);
+  if (isNaN(rating) || rating < 1 || rating > 5) {
+    return { success: false, message: "Rating must be between 1 and 5." };
+  }
+
+  // Get max display_order
+  const { data: maxRow } = await svc
+    .from("testimonials")
+    .select("display_order")
+    .order("display_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const nextOrder = (maxRow?.display_order ?? 0) + 1;
+
+  const { error } = await svc.from("testimonials").insert({
+    couple_name: coupleName,
+    location,
+    venue_name: venueName,
+    rating,
+    text,
+    is_featured: false,
+    is_active: true,          // auto-publish
+    display_order: nextOrder,
+  });
+
+  if (error) {
+    console.error("submitTestimonial error:", error);
+    return { success: false, message: "Something went wrong. Please try again." };
+  }
+
+  return { success: true, message: "Thank you! Your feedback has been published." };
 }
