@@ -1,0 +1,22 @@
+All done — pushed as commit 6aa5bc9. Here's what changed:
+
+Enquiry form submit button fix (lead-form.tsx):
+
+Modal now has max-h-[90vh] flex flex-col — it won't grow past the screen height
+Inner content area has overflow-y-auto flex-1 — scrollable when content is tall, submit button is always reachable
+Admin full profile management (src/app/(admin)/admin/users/user-role-actions.tsx/admin/users/user-role-actions.tsx)):
+
+New pencil (✏️) button → opens "Edit Profile" panel with:
+Avatar — click camera icon to upload a photo from disk (uploads to Supabase avatars storage bucket), or paste a URL directly
+Full Name field
+Phone + City fields (side by side)
+Save Changes button with spinner
+Amber key (🔑) button → still opens password change panel (same as before, just styled better now)
+Both panels are toggle-exclusive (opening one closes the other)
+New server action (actions.ts):
+
+adminUpdateUserProfile(userId, { full_name, phone, city, avatar_url }) — admin-only, updates any user's profile
+User table avatar (src/app/(admin)/admin/users/page.tsx/admin/users/page.tsx)):
+
+If a user has an avatar_url, it now shows as a real circular photo instead of the letter initial
+Note for avatar uploads: Supabase needs a public avatars bucket. Go to Supabase → Storage → New bucket, name it avatars, set it Public. Without this bucket the upload will fail with "bucket not found" but the paste-URL fallback will still work.
