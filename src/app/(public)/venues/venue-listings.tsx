@@ -1,21 +1,39 @@
-import { getVenues } from "@/lib/actions";
-import { VenueCard } from "@/components/venue/venue-card";
-import type { VenueType, VenueSearchParams } from "@/lib/types";
+"use client";
 
-export async function VenueListings({
+import { useEffect, useState } from "react";
+import { getVenues } from "@/lib/client-actions";
+import { VenueCard } from "@/components/venue/venue-card";
+import type { Venue, VenueType, VenueSearchParams } from "@/lib/types";
+
+export function VenueListings({
   searchParams = {},
 }: {
   searchParams?: Record<string, string>;
 }) {
-  const venueParams: VenueSearchParams = {
-    city: searchParams.city,
-    venue_type: searchParams.type as VenueType | undefined,
-    capacity: searchParams.capacity ? Number(searchParams.capacity) : undefined,
-    q: searchParams.q,
-  };
+  const [venues, setVenues] = useState<Venue[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { venues } = await getVenues(venueParams);
+  useEffect(() => {
+    const venueParams: VenueSearchParams = {
+      city: searchParams.city,
+      venue_type: searchParams.type as VenueType | undefined,
+      capacity: searchParams.capacity ? Number(searchParams.capacity) : undefined,
+      q: searchParams.q,
+    };
+    getVenues(venueParams).then(({ venues: v }) => { setVenues(v); setLoading(false); }).catch(() => setLoading(false));
+  }, [searchParams.city, searchParams.type, searchParams.capacity, searchParams.q]);
+
   const activeFilter = searchParams.city || searchParams.type || searchParams.q;
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-2xl h-80 animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <>

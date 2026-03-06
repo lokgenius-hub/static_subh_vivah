@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
-import { adminApproveUser, adminRejectUser } from "@/lib/actions";
+import { adminApproveUser, adminRejectUser } from "@/lib/client-actions";
 
 export function ApprovalActions({ userId }: { userId: string }) {
   const [loading, setLoading] = useState<"approve" | "reject" | null>(null);

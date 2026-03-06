@@ -5,7 +5,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMont
 import { ChevronLeft, ChevronRight, Phone, MessageSquare, X, PhoneCall, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { getVenueSlots } from "@/lib/actions";
+import { getVenueSlots } from "@/lib/client-actions";
 import { LeadForm } from "@/components/venue/lead-form";
 import type { VenueSlot } from "@/lib/types";
 

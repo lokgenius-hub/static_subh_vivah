@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/hooks/use-auth";
+import { SPARedirectHandler } from "@/components/spa-redirect";
 
 export const metadata: Metadata = {
   title: "VivahSthal - Best Wedding Venues in Bhabua, Sasaram & Kaimur | Bihar",
@@ -34,7 +36,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="min-h-screen bg-[var(--color-cream)] text-[var(--color-charcoal)]">
-        {children}
+        <AuthProvider>
+          <SPARedirectHandler />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { getInboxMessages, markInboxRead } from "@/lib/actions";
+import { getInboxMessages, markInboxRead } from "@/lib/client-actions";
 import type { EnquiryInbox } from "@/lib/types";
 import {
   Mail, MailOpen, Phone, Calendar, Users, IndianRupee,

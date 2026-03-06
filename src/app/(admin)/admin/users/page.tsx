@@ -1,13 +1,11 @@
-import { getAllUsers, getPendingUsers } from "@/lib/actions";
-import { Badge } from "@/components/ui/badge";
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { getAllUsers, getPendingUsers } from "@/lib/client-actions";
 import { Users, UserCheck, Building2, Shield, Phone, Mail, Clock, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { UserRoleActions } from "./user-role-actions";
 import { ApprovalActions } from "./user-approval-actions";
-
-export const metadata = {
-  title: "User Management | VivahSthal Admin",
-};
 
 const roleBadgeColors: Record<string, string> = {
   customer: "bg-blue-100 text-blue-700",
@@ -16,20 +14,31 @@ const roleBadgeColors: Record<string, string> = {
   rm: "bg-amber-100 text-amber-700",
 };
 
-export default async function AdminUsersPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string>>;
-}) {
-  const params = await searchParams;
-  const [users, pendingUsers] = await Promise.all([
-    getAllUsers({ role: params.role, q: params.q }),
-    getPendingUsers(),
-  ]);
+export default function AdminUsersPage() {
+  const [users, setUsers] = useState<Record<string, unknown>[]>([]);
+  const [pendingUsers, setPendingUsers] = useState<Record<string, unknown>[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filterQ, setFilterQ] = useState("");
+  const [filterRole, setFilterRole] = useState("");
 
-  const customerCount = users.filter((u: Record<string, unknown>) => u.role === "customer").length;
-  const vendorCount = users.filter((u: Record<string, unknown>) => u.role === "vendor").length;
-  const adminCount = users.filter((u: Record<string, unknown>) => u.role === "admin" || u.role === "rm").length;
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const [u, pu] = await Promise.all([
+      getAllUsers({ role: filterRole || undefined, q: filterQ || undefined }),
+      getPendingUsers(),
+    ]);
+    setUsers(u); setPendingUsers(pu); setLoading(false);
+  }, [filterQ, filterRole]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const customerCount = users.filter((u) => u.role === "customer").length;
+  const vendorCount = users.filter((u) => u.role === "vendor").length;
+  const adminCount = users.filter((u) => u.role === "admin" || u.role === "rm").length;
+
+  if (loading) {
+    return <div className="flex items-center justify-center py-20"><div className="animate-spin h-8 w-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -113,17 +122,17 @@ export default async function AdminUsersPage({
       </div>
 
       <div className="flex items-center gap-3">
-        <form className="flex-1 flex gap-2">
+        <div className="flex-1 flex gap-2">
           <input
-            name="q"
             type="text"
-            defaultValue={params.q || ""}
+            value={filterQ}
+            onChange={(e) => setFilterQ(e.target.value)}
             placeholder="Search by name, email, or phone..."
             className="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
           />
           <select
-            name="role"
-            defaultValue={params.role || ""}
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value)}
             className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none"
           >
             <option value="">All Roles</option>
@@ -133,12 +142,13 @@ export default async function AdminUsersPage({
             <option value="rm">RM</option>
           </select>
           <button
-            type="submit"
+            type="button"
+            onClick={fetchData}
             className="px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium hover:opacity-90"
           >
             Filter
           </button>
-        </form>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">

@@ -1,31 +1,17 @@
-import { Suspense } from "react";
-import { getMarriagePackages } from "@/lib/actions";
+"use client";
+
+import { useEffect, useState } from "react";
+import { getMarriagePackages } from "@/lib/client-actions";
 import { PricingCards } from "../sections/pricing-cards";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Wedding Packages & Pricing — Silver, Golden, Diamond | VivahSthal Bhabua Sasaram",
-  description:
-    "Affordable all-inclusive marriage packages in Bhabua, Sasaram & Kaimur region. Silver, Golden & Diamond packages with venue, catering, decoration, photography & entertainment. Book your dream wedding today!",
-  keywords: [
-    "wedding package Bhabua", "marriage package Sasaram",
-    "wedding price Bihar", "shaadi package", "vivah package",
-    "banquet hall package", "lawn booking Bhabua",
-    "wedding catering Sasaram", "marriage decoration Kaimur",
-    "affordable wedding Bihar",
-  ],
-  openGraph: {
-    title: "Wedding Packages — VivahSthal | Bhabua & Sasaram",
-    description: "All-inclusive wedding packages starting at ₹1.5 Lakh. Venue + Catering + Decoration + Photography.",
-  },
-};
-
-async function PackagesContent() {
-  const packages = await getMarriagePackages();
-  return <PricingCards packages={packages} />;
-}
+import type { MarriagePackage } from "@/lib/types";
 
 export default function PricingPage() {
+  const [packages, setPackages] = useState<MarriagePackage[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getMarriagePackages().then((p) => { setPackages(p); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
       {/* Hero */}
@@ -48,9 +34,11 @@ export default function PricingPage() {
         </div>
       </div>
 
-      <Suspense fallback={<div className="h-96 animate-pulse bg-gray-100" />}>
-        <PackagesContent />
-      </Suspense>
+      {loading ? (
+        <div className="h-96 animate-pulse bg-gray-100" />
+      ) : (
+        <PricingCards packages={packages} />
+      )}
 
       {/* Trust Section */}
       <section className="py-12 bg-white">

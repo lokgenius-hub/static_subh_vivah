@@ -1,83 +1,26 @@
-import { getLeads } from "@/lib/actions";
+"use client";
+
+import { useEffect, useState } from "react";
+import { getLeads } from "@/lib/client-actions";
 import { Badge } from "@/components/ui/badge";
 import { LEAD_STATUS_COLORS } from "@/lib/constants";
-import { Phone, Mail, Calendar, Users, Building2, Clock, MapPin } from "lucide-react";
+import { Phone, Mail, Calendar, Users, Building2 } from "lucide-react";
 import { format } from "date-fns";
 import { LeadActions } from "./lead-actions";
 
-export const metadata = {
-  title: "Lead Management | VivahSthal Admin",
-};
+export default function LeadsPage() {
+  const [leads, setLeads] = useState<Record<string, unknown>[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function LeadsPage() {
-  const leads = await getLeads();
+  useEffect(() => {
+    getLeads().then((l) => { setLeads(l as Record<string, unknown>[]); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
 
-  // Demo leads for when DB is empty
-  const displayLeads =
-    leads.length > 0
-      ? leads
-      : [
-          {
-            id: "l1",
-            venue_id: "1",
-            customer_id: null,
-            customer_name: "Rahul Kumar",
-            customer_email: "rahul@example.com",
-            customer_phone: "+91 98765 43210",
-            event_date: "2026-04-22",
-            slot_preference: "evening" as const,
-            guest_count: 300,
-            budget_range: "300000-500000",
-            message: "Looking for a grand banquet hall for my daughter's wedding.",
-            source: "website",
-            status: "new" as const,
-            assigned_rm_id: null,
-            notes: null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            venue: { name: "Royal Palace Banquet" } as any,
-          },
-          {
-            id: "l2",
-            venue_id: "2",
-            customer_id: null,
-            customer_name: "Priya Sinha",
-            customer_email: "priya@example.com",
-            customer_phone: "+91 87654 32109",
-            event_date: "2026-05-10",
-            slot_preference: "full_day" as const,
-            guest_count: 500,
-            budget_range: "500000-1000000",
-            message: "Need a resort with lawn for a destination feel.",
-            source: "ai_chatbot",
-            status: "contacted" as const,
-            assigned_rm_id: null,
-            notes: null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            venue: { name: "Garden Paradise Resort" } as any,
-          },
-          {
-            id: "l3",
-            venue_id: "3",
-            customer_id: null,
-            customer_name: "Amit Verma",
-            customer_email: "amit@example.com",
-            customer_phone: "+91 76543 21098",
-            event_date: "2026-11-19",
-            slot_preference: "morning" as const,
-            guest_count: 200,
-            budget_range: "100000-300000",
-            message: "Traditional wedding on Tulsi Vivah date.",
-            source: "view_contact",
-            status: "qualified" as const,
-            assigned_rm_id: null,
-            notes: null,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            venue: { name: "Heritage Haveli" } as any,
-          },
-        ];
+  if (loading) {
+    return <div className="flex items-center justify-center py-20"><div className="animate-spin h-8 w-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>;
+  }
+
+  const displayLeads = leads.length > 0 ? leads : [];
 
   return (
     <div className="space-y-6">

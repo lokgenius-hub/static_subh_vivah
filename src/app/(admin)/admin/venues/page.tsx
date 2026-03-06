@@ -1,22 +1,32 @@
-import { getAllVenues } from "@/lib/actions";
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { getAllVenues } from "@/lib/client-actions";
 import { AdminVenuesTable } from "./venues-table";
 import type { Venue } from "@/lib/types";
 
-export const metadata = {
-  title: "Venue Management | VivahSthal Admin",
-};
+export default function AdminVenuesPage() {
+  const [venues, setVenues] = useState<(Venue & { vendor?: { full_name?: string; email?: string } | null })[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filterQ, setFilterQ] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
 
-export default async function AdminVenuesPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string>>;
-}) {
-  const params = await searchParams;
-  const venues = await getAllVenues({ status: params.status, q: params.q });
+  const fetchVenues = useCallback(async () => {
+    setLoading(true);
+    const v = await getAllVenues({ status: filterStatus || undefined, q: filterQ || undefined });
+    setVenues(v as (Venue & { vendor?: { full_name?: string; email?: string } | null })[]);
+    setLoading(false);
+  }, [filterQ, filterStatus]);
 
-  const activeCount = venues.filter((v: Record<string, unknown>) => v.is_active).length;
-  const inactiveCount = venues.filter((v: Record<string, unknown>) => !v.is_active).length;
-  const featuredCount = venues.filter((v: Record<string, unknown>) => v.is_featured).length;
+  useEffect(() => { fetchVenues(); }, [fetchVenues]);
+
+  const activeCount = venues.filter((v) => v.is_active).length;
+  const inactiveCount = venues.filter((v) => !v.is_active).length;
+  const featuredCount = venues.filter((v) => v.is_featured).length;
+
+  if (loading) {
+    return <div className="flex items-center justify-center py-20"><div className="animate-spin h-8 w-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -42,17 +52,17 @@ export default async function AdminVenuesPage({
       </div>
 
       <div className="flex items-center gap-3">
-        <form className="flex-1 flex gap-2">
+        <div className="flex-1 flex gap-2">
           <input
-            name="q"
             type="text"
-            defaultValue={params.q || ""}
+            value={filterQ}
+            onChange={(e) => setFilterQ(e.target.value)}
             placeholder="Search venues by name or city..."
             className="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
           />
           <select
-            name="status"
-            defaultValue={params.status || ""}
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
             className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none"
           >
             <option value="">All Status</option>
@@ -60,12 +70,13 @@ export default async function AdminVenuesPage({
             <option value="inactive">Inactive</option>
           </select>
           <button
-            type="submit"
+            type="button"
+            onClick={fetchVenues}
             className="px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium hover:opacity-90"
           >
             Filter
           </button>
-        </form>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">

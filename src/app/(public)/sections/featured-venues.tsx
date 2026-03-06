@@ -1,11 +1,34 @@
-import { getFeaturedVenues } from "@/lib/actions";
+"use client";
+
+import { useEffect, useState } from "react";
+import { getFeaturedVenues } from "@/lib/client-actions";
 import { VenueCard } from "@/components/venue/venue-card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Heart } from "lucide-react";
 import Link from "next/link";
+import type { Venue } from "@/lib/types";
 
-export async function FeaturedVenues() {
-  const venues = await getFeaturedVenues();
+export function FeaturedVenues() {
+  const [venues, setVenues] = useState<Venue[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getFeaturedVenues().then((v) => { setVenues(v); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="section-padding bg-gray-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl h-80 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   // If no venues in DB, show a call-to-action instead of broken demo cards
   if (venues.length === 0) {

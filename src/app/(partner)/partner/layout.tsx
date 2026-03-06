@@ -1,35 +1,33 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Building2, Calendar, Settings, Home, Mail } from "lucide-react";
 import { SignOutButton } from "@/components/ui/sign-out-button";
 import { MobilePartnerNav } from "@/components/layout/mobile-partner-nav";
+import { useAuth } from "@/hooks/use-auth";
 
-export default async function PartnerLayout({
+export default function PartnerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const router = useRouter();
+  const { user, profile, loading } = useAuth();
 
-  if (!user) redirect("/login?redirect=/partner/dashboard");
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { router.push("/login?redirect=/partner/dashboard"); return; }
+    const effectiveRole = profile?.role ?? (user.user_metadata?.role as string | undefined);
+    if (effectiveRole !== "vendor" && effectiveRole !== "admin") router.push("/venues");
+  }, [user, profile, loading, router]);
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  // Fall back to JWT metadata when DB is unreachable (e.g. Supabase paused / SSL error)
-  const effectiveRole =
-    profile?.role ?? (user.user_metadata?.role as string | undefined);
-
-  if (effectiveRole !== "vendor" && effectiveRole !== "admin") {
-    redirect("/venues");
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>;
   }
+
+  if (!user) return null;
 
   const displayName =
     profile?.full_name ??

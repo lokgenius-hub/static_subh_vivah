@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { updateUserRole, adminSetUserPassword, adminUpdateUserProfile } from "@/lib/actions";
+import { updateUserRole, adminSetUserPassword, adminUpdateUserProfile } from "@/lib/client-actions";
 import { createClient } from "@/lib/supabase/client";
 import { KeyRound, Eye, EyeOff, Pencil, X, Check, Loader2, Camera } from "lucide-react";
 

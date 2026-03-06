@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { getInboxMessages, markInboxRead } from "@/lib/actions";
+import { getInboxMessages, markInboxRead } from "@/lib/client-actions";
 import type { EnquiryInbox } from "@/lib/types";
 
 export default function AdminInboxPage() {

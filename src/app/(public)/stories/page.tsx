@@ -1,25 +1,17 @@
-import { Suspense } from "react";
-import { getSuccessStories } from "@/lib/actions";
-import type { Metadata } from "next";
+"use client";
+
+import { useEffect, useState } from "react";
+import { getSuccessStories } from "@/lib/client-actions";
 import { StoriesList } from "./stories-list";
-
-export const metadata: Metadata = {
-  title: "Success Stories — Real Weddings | VivahSthal Bhabua Sasaram",
-  description:
-    "Read real wedding stories from Bhabua, Sasaram & Kaimur region. See how VivahSthal helped couples celebrate their dream marriage with beautiful venues and complete packages.",
-  keywords: [
-    "wedding stories Bhabua", "real weddings Sasaram",
-    "marriage success stories Bihar", "wedding photos Kaimur",
-    "VivahSthal weddings", "best wedding planner Bihar",
-  ],
-};
-
-async function StoriesContent() {
-  const stories = await getSuccessStories();
-  return <StoriesList stories={stories} />;
-}
+import type { SuccessStory } from "@/lib/types";
 
 export default function SuccessStoriesPage() {
+  const [stories, setStories] = useState<SuccessStory[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getSuccessStories().then((s) => { setStories(s); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
       {/* Hero */}
@@ -42,9 +34,11 @@ export default function SuccessStoriesPage() {
         </div>
       </div>
 
-      <Suspense fallback={<div className="h-96 animate-pulse bg-gray-100" />}>
-        <StoriesContent />
-      </Suspense>
+      {loading ? (
+        <div className="h-96 animate-pulse bg-gray-100" />
+      ) : (
+        <StoriesList stories={stories} />
+      )}
     </div>
   );
 }

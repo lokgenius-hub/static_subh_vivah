@@ -6,7 +6,7 @@ import { Phone, X, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { createLead } from "@/lib/actions";
+import { createLead } from "@/lib/client-actions";
 import { SLOT_TYPES, BUDGET_RANGES } from "@/lib/constants";
 interface LeadFormProps {
   venueId?: string;

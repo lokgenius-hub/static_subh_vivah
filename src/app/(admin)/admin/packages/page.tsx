@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { getMarriagePackages, createMarriagePackage, updateMarriagePackage, deleteMarriagePackage } from "@/lib/actions";
+import { getMarriagePackages, createMarriagePackage, updateMarriagePackage, deleteMarriagePackage } from "@/lib/client-actions";
 import { formatPrice } from "@/lib/utils";
 import type { MarriagePackage } from "@/lib/types";
 

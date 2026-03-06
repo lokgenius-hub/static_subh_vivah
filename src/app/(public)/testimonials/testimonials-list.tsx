@@ -6,7 +6,7 @@ import { Star, Quote, MapPin, Heart, Calendar, ArrowRight, Send, CheckCircle2 } 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { submitTestimonial } from "@/lib/actions";
+import { submitTestimonial } from "@/lib/client-actions";
 import type { Testimonial } from "@/lib/types";
 
 const demoTestimonials: Testimonial[] = [

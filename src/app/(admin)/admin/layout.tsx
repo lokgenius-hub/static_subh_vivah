@@ -1,35 +1,34 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import Link from "next/link";
-import { LayoutDashboard, Phone, Users, Settings, Shield, LogOut, BookOpen, Home, Mail, Package } from "lucide-react";
-import { SignOutButton } from "@/components/ui/sign-out-button";
+"use client";
 
-export default async function AdminLayout({
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { LayoutDashboard, Phone, Users, Settings, Shield, BookOpen, Home, Mail, Package } from "lucide-react";
+import { SignOutButton } from "@/components/ui/sign-out-button";
+import { useAuth } from "@/hooks/use-auth";
+
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const router = useRouter();
+  const { user, profile, loading } = useAuth();
 
-  if (!user) redirect("/login?redirect=/admin/leads");
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { router.push("/login?redirect=/admin/leads"); return; }
+    const effectiveRole = profile?.role ?? (user.user_metadata?.role as string | undefined);
+    if (effectiveRole && !["admin", "rm"].includes(effectiveRole)) router.push("/");
+  }, [user, profile, loading, router]);
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  // Fall back to JWT metadata when DB is unreachable
-  const effectiveRole =
-    profile?.role ?? (user.user_metadata?.role as string | undefined);
-
-  if (effectiveRole && !["admin", "rm"].includes(effectiveRole)) {
-    redirect("/");
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>;
   }
 
+  if (!user) return null;
+
+  const effectiveRole = profile?.role ?? (user.user_metadata?.role as string | undefined);
   const displayName =
     profile?.full_name ??
     (user.user_metadata?.full_name as string | undefined) ??

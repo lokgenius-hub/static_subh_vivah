@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Mail, Lock, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { signUpUser } from "@/lib/actions";
+import { signUpUser } from "@/lib/client-actions";
 import { createClient } from "@/lib/supabase/client";
 
 function GoogleIcon() {

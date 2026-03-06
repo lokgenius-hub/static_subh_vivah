@@ -1,25 +1,17 @@
-import { Suspense } from "react";
-import { getTestimonials } from "@/lib/actions";
-import type { Metadata } from "next";
+"use client";
+
+import { useEffect, useState } from "react";
+import { getTestimonials } from "@/lib/client-actions";
 import { TestimonialsList } from "./testimonials-list";
-
-export const metadata: Metadata = {
-  title: "Testimonials — Happy Couples | VivahSthal Bhabua Sasaram",
-  description:
-    "Read real reviews from couples who celebrated their dream wedding with VivahSthal in Bhabua, Sasaram & across Kaimur district. 500+ happy families and counting!",
-  keywords: [
-    "wedding reviews Bhabua", "marriage testimonials Sasaram",
-    "wedding venue reviews Bihar", "VivahSthal reviews",
-    "happy couples Kaimur", "best wedding service Bihar",
-  ],
-};
-
-async function TestimonialsContent() {
-  const testimonials = await getTestimonials();
-  return <TestimonialsList testimonials={testimonials} />;
-}
+import type { Testimonial } from "@/lib/types";
 
 export default function TestimonialsPage() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getTestimonials().then((t) => { setTestimonials(t); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">
       {/* Hero */}
@@ -42,9 +34,11 @@ export default function TestimonialsPage() {
         </div>
       </div>
 
-      <Suspense fallback={<div className="h-96 animate-pulse bg-gray-100" />}>
-        <TestimonialsContent />
-      </Suspense>
+      {loading ? (
+        <div className="h-96 animate-pulse bg-gray-100" />
+      ) : (
+        <TestimonialsList testimonials={testimonials} />
+      )}
     </div>
   );
 }

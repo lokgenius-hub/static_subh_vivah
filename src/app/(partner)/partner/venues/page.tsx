@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Building2, Pencil, Plus, X, MapPin, Users, IndianRupee, Eye, CheckCircle2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VenueForm, type VenueFormSubmitArgs } from "@/components/venue/venue-form";
-import { createVenue, updateVenue, getMyVenues } from "@/lib/actions";
+import { createVenue, updateVenue, getMyVenues } from "@/lib/client-actions";
 import type { Venue } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 

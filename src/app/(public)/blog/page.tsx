@@ -1,21 +1,19 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getBlogPosts } from "@/lib/actions";
+import { getBlogPosts } from "@/lib/client-actions";
 import { BookOpen, Youtube, Calendar, Tag } from "lucide-react";
-import type { Metadata } from "next";
+import type { BlogPost } from "@/lib/types";
 
-export const metadata: Metadata = {
-  title: "Blog & Wedding Tips | VivahSthal",
-  description:
-    "Wedding planning tips, venue guides, decoration ideas, and expert advice for your dream Indian wedding. Stay updated with VivahSthal.",
-  openGraph: {
-    title: "Wedding Blog | VivahSthal",
-    description: "Tips, guides and inspiration for your perfect wedding venue in Bihar and India.",
-  },
-};
+export default function BlogPage() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default async function BlogPage() {
-  const posts = await getBlogPosts(true);
+  useEffect(() => {
+    getBlogPosts(true).then((p) => { setPosts(p); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
 
   return (
     <div className="min-h-screen bg-[var(--color-cream)]">

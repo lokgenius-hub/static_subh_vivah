@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   getBlogPosts, createBlogPost, updateBlogPost, deleteBlogPost,
-} from "@/lib/actions";
+} from "@/lib/client-actions";
 import type { BlogPost } from "@/lib/types";
 
 // ── Blog Post Form ──────────────────────────────────────────

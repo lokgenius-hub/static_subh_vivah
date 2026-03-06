@@ -55,19 +55,6 @@ export async function clearSupabaseSession() {
     // Ignore errors — session data is already wiped client-side
   }
 
-  // Also call server-side signout to clear server-side cookies
-  try {
-    const { serverSignOut } = await import("@/lib/actions");
-    await Promise.race([
-      serverSignOut(),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), 2000)
-      ),
-    ]);
-  } catch {
-    // Non-critical — client-side cookies are already wiped
-  }
-
   // Clear again in case signOut re-set any cookies
   clearAllSupabaseCookies();
   clearSupabaseLocalStorage();

@@ -7,7 +7,7 @@ import { Mail, Lock, User, Phone, Building2, ArrowRight, ShieldCheck, RefreshCw 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { upgradeToVendor, sendRegistrationOtp, verifyRegistrationOtp } from "@/lib/actions";
+import { upgradeToVendor, sendRegistrationOtp, verifyRegistrationOtp } from "@/lib/client-actions";
 import { createClient } from "@/lib/supabase/client";
 import { CITIES } from "@/lib/constants";
 

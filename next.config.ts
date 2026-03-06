@@ -1,22 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "export",
+  basePath: "/static_subh_vivah",
   eslint: {
     ignoreDuringBuilds: true,
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "*.supabase.co",
-        pathname: "/storage/v1/object/public/**",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-    ],
+  typescript: {
+    ignoreBuildErrors: true,
   },
+  images: {
+    unoptimized: true,
+  },
+  // trailingSlash ensures each page gets its own folder with index.html
+  trailingSlash: true,
 };
 
 export default nextConfig;

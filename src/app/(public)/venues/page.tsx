@@ -1,18 +1,18 @@
-import { Suspense } from "react";
+"use client";
+
+import { Suspense, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { SearchFilters } from "@/components/venue/search-filters";
 import { VenueListings } from "./venue-listings";
 
-export const metadata = {
-  title: "Browse Wedding Venues | VivahSthal",
-  description: "Search and discover the perfect wedding venue with advanced filters",
-};
+function VenuesPageInner() {
+  const searchParams = useSearchParams();
+  const params = useMemo(() => {
+    const obj: Record<string, string> = {};
+    searchParams.forEach((v, k) => { obj[k] = v; });
+    return obj;
+  }, [searchParams]);
 
-export default async function VenuesPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string>>;
-}) {
-  const params = await searchParams;
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -24,26 +24,22 @@ export default async function VenuesPage({
           <p className="text-gray-400 mb-6">
             Browse 20+ verified wedding venues in Bhabua, Sasaram &amp; Kaimur
           </p>
-          <Suspense fallback={<div className="h-14 bg-white/10 rounded-2xl animate-pulse" />}>
-            <SearchFilters variant="hero" />
-          </Suspense>
+          <SearchFilters variant="hero" />
         </div>
       </div>
 
       {/* Results */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-        <Suspense
-          fallback={
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl h-80 animate-pulse" />
-              ))}
-            </div>
-          }
-        >
-          <VenueListings searchParams={params} />
-        </Suspense>
+        <VenueListings searchParams={params} />
       </div>
     </div>
+  );
+}
+
+export default function VenuesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>}>
+      <VenuesPageInner />
+    </Suspense>
   );
 }

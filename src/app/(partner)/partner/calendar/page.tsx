@@ -7,7 +7,7 @@ import {
 } from "date-fns";
 import { ChevronLeft, ChevronRight, Sun, Moon, Clock, Building2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getMyVenues, getVenueSlots, updateVenueSlot } from "@/lib/actions";
+import { getMyVenues, getVenueSlots, updateVenueSlot } from "@/lib/client-actions";
 import type { Venue, VenueSlot } from "@/lib/types";
 
 export default function CalendarPage() {

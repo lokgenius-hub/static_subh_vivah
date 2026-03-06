@@ -1,6 +1,6 @@
 "use client";
 
-import { updateLeadStatus } from "@/lib/actions";
+import { updateLeadStatus } from "@/lib/client-actions";
 import { Select } from "@/components/ui/select";
 
 const statusOptions = [

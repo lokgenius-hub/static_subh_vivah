@@ -1,15 +1,27 @@
-import { getAdminStats } from "@/lib/actions";
+"use client";
+
+import { useEffect, useState } from "react";
+import { getAdminStats } from "@/lib/client-actions";
 import {
   Building2, Users, Phone, TrendingUp,
-  CheckCircle2, XCircle, Star, UserCheck,
+  CheckCircle2, Star, UserCheck,
 } from "lucide-react";
 
-export const metadata = {
-  title: "Settings & Dashboard | VivahSthal Admin",
-};
+export default function AdminSettingsPage() {
+  const [stats, setStats] = useState({
+    totalVenues: 0, activeVenues: 0, featuredVenues: 0,
+    totalUsers: 0, vendors: 0, customers: 0,
+    totalLeads: 0, newLeads: 0, convertedLeads: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-export default async function AdminSettingsPage() {
-  const stats = await getAdminStats();
+  useEffect(() => {
+    getAdminStats().then((s) => { setStats(s); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <div className="flex items-center justify-center py-20"><div className="animate-spin h-8 w-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full" /></div>;
+  }
 
   return (
     <div className="space-y-6">

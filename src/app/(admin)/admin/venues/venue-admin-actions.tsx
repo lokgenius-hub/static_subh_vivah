@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { toggleVenueStatus, toggleVenueFeatured, deleteVenue, updateVenue } from "@/lib/actions";
+import { toggleVenueStatus, toggleVenueFeatured, deleteVenue, updateVenue } from "@/lib/client-actions";
 import { Eye, EyeOff, Star, StarOff, Trash2, Loader2, Pencil, X, CheckCircle2 } from "lucide-react";
 import { VenueForm, type VenueFormSubmitArgs } from "@/components/venue/venue-form";
 import type { Venue } from "@/lib/types";

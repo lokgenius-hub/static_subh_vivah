@@ -5,7 +5,7 @@ import { User, Phone, CheckCircle2, Loader2, AlertTriangle, RefreshCw } from "lu
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { getMyProfile, updateMyProfile } from "@/lib/actions";
+import { getMyProfile, updateMyProfile } from "@/lib/client-actions";
 import { CITIES } from "@/lib/constants";
 
 export default function PartnerSettings() {
