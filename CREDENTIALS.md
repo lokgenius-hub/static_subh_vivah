@@ -11,8 +11,8 @@
 | Password | `Admin@Vivah2024`      |
 | Role     | `admin`                |
 
-**Login URL:** `https://your-domain.com/login`  
-**Dashboard:** `https://your-domain.com/admin/leads`
+**Login URL:** `https://lokgenius-hub.github.io/static_subh_vivah/login`  
+**Dashboard:** `https://lokgenius-hub.github.io/static_subh_vivah/admin/leads`
 
 ---
 
@@ -43,7 +43,7 @@ Each venue has its own partner login. All passwords follow the pattern: `VenueNa
 | 19 | Sanjay Vatika | `sanjay.vatika@vivahsthal.com` | `Sanjay@2024!` | Bhabua |
 | 20 | NAGABABA RESIDENCY | `nagababa.residency@vivahsthal.com` | `NagababaR@2024!` | Bhabua |
 
-**Partner Dashboard:** `https://your-domain.com/partner/dashboard`
+**Partner Dashboard:** `https://lokgenius-hub.github.io/static_subh_vivah/partner/dashboard`
 
 ---
 
