@@ -5,8 +5,14 @@ import { getLeads } from "@/lib/client-actions";
 import { Badge } from "@/components/ui/badge";
 import { LEAD_STATUS_COLORS } from "@/lib/constants";
 import { Phone, Mail, Calendar, Users, Building2 } from "lucide-react";
-import { format } from "date-fns";
 import { LeadActions } from "./lead-actions";
+
+function fmtDate(d: unknown) {
+  if (!d) return null;
+  try {
+    return new Date(d as string).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  } catch { return String(d); }
+}
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Record<string, unknown>[]>([]);
@@ -88,7 +94,7 @@ export default function LeadsPage() {
                       {lead.event_date && (
                         <div className="flex items-center gap-1 text-gray-600">
                           <Calendar className="h-3 w-3" />
-                          {format(new Date(lead.event_date), "MMM d, yyyy")}
+                          {fmtDate(lead.event_date)}
                         </div>
                       )}
                       {lead.guest_count && (
@@ -103,7 +109,7 @@ export default function LeadsPage() {
                   </td>
                   <td className="px-4 py-4">
                     <Badge variant={lead.source === "ai_chatbot" ? "gold" : "default"}>
-                      {lead.source.replace("_", " ")}
+                      {(lead.source as string | null)?.replace(/_/g, " ") ?? "website"}
                     </Badge>
                   </td>
                   <td className="px-4 py-4">

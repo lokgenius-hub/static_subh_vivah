@@ -447,13 +447,17 @@ export async function getLeads(status?: string) {
   const supabase = createClient();
   let query = supabase
     .from("leads")
-    .select("*, venue:venues!leads_venue_id_fkey(name, city)")
+    .select("*, venue:venues(name, city)")
     .order("created_at", { ascending: false });
 
   if (status && status !== "all") query = query.eq("status", status);
   const { data, error } = await query;
-  if (error) return [];
-  return data as Lead[];
+  if (error) {
+    // Fallback: fetch leads without the join
+    const fallback = await supabase.from("leads").select("*").order("created_at", { ascending: false });
+    return (fallback.data ?? []) as Lead[];
+  }
+  return (data ?? []) as Lead[];
 }
 
 export async function updateLeadStatus(leadId: string, status: string) {
