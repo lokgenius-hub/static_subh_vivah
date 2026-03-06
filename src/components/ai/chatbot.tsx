@@ -32,8 +32,16 @@ export function AIChatbot() {
     },
   ];
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
   const { messages, sendMessage, status, error } = useChat({
     id: "vivahsthal-chat",
+    api: `${supabaseUrl}/functions/v1/chat`,
+    headers: {
+      Authorization: `Bearer ${supabaseAnonKey}`,
+      apikey: supabaseAnonKey ?? "",
+    },
     messages: initialMsgs,
   });
 
