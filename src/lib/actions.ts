@@ -252,6 +252,7 @@ export async function signUpUser(formData: {
           const existingUser = existing?.users?.find(u => u.email === formData.email);
           if (existingUser) {
             // User was created despite trigger error — upsert profile and continue
+            const isAdminRole = formData.role === "admin" || formData.role === "rm";
             await serviceClient.from("profiles").upsert(
               {
                 id: existingUser.id,
@@ -259,6 +260,7 @@ export async function signUpUser(formData: {
                 email: formData.email,
                 phone: formData.phone || null,
                 role: (formData.role as "customer" | "vendor" | "admin" | "rm") || "customer",
+                approved_status: isAdminRole ? "approved" : "pending",
               },
               { onConflict: "id" }
             );
@@ -276,6 +278,7 @@ export async function signUpUser(formData: {
 
     // Step 2: Manually upsert profile using service role — works even if trigger is broken/missing
     const serviceClient = await createServiceClient();
+    const isAdminRole = formData.role === "admin" || formData.role === "rm";
     await serviceClient.from("profiles").upsert(
       {
         id: user.id,
@@ -283,6 +286,8 @@ export async function signUpUser(formData: {
         email: formData.email,
         phone: formData.phone || null,
         role: (formData.role as "customer" | "vendor" | "admin" | "rm") || "customer",
+        // New signups must wait for super-admin approval (admins bypass this)
+        approved_status: isAdminRole ? "approved" : "pending",
       },
       { onConflict: "id" }
     );
@@ -995,7 +1000,62 @@ export async function adminUpdateUserProfile(
 }
 
 // ============================================================
-// PARTNER: PROFILE MANAGEMENT
+// ADMIN: USER APPROVAL
+// ============================================================
+
+export async function getPendingUsers() {
+  const serviceClient = await createServiceClient();
+  const { data, error } = await serviceClient
+    .from("profiles")
+    .select("*")
+    .eq("approved_status", "pending")
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error("Error fetching pending users:", error);
+    return [];
+  }
+  return data || [];
+}
+
+export async function adminApproveUser(userId: string) {
+  "use server";
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const serviceClient = await createServiceClient();
+  const { data: adminProfile } = await serviceClient.from("profiles").select("role").eq("id", user.id).single();
+  if (adminProfile?.role !== "admin") return { success: false, error: "Admin access required" };
+
+  const { error } = await serviceClient
+    .from("profiles")
+    .update({ approved_status: "approved" })
+    .eq("id", userId);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/admin/users");
+  return { success: true };
+}
+
+export async function adminRejectUser(userId: string) {
+  "use server";
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: "Not authenticated" };
+
+  const serviceClient = await createServiceClient();
+  const { data: adminProfile } = await serviceClient.from("profiles").select("role").eq("id", user.id).single();
+  if (adminProfile?.role !== "admin") return { success: false, error: "Admin access required" };
+
+  const { error } = await serviceClient
+    .from("profiles")
+    .update({ approved_status: "rejected" })
+    .eq("id", userId);
+  if (error) return { success: false, error: error.message };
+  revalidatePath("/admin/users");
+  return { success: true };
+}
+
+// ============================================================
 // ============================================================
 
 export async function getMyProfile() {

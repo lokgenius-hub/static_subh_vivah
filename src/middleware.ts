@@ -11,6 +11,11 @@ export async function middleware(request: NextRequest) {
   const isProtected =
     !isPublicPath && protectedPaths.some((p) => pathname.startsWith(p));
 
+  // Never intercept the pending-approval page itself (prevents redirect loop)
+  if (pathname === "/pending-approval") {
+    return NextResponse.next({ request: { headers: request.headers } });
+  }
+
   let response = NextResponse.next({
     request: { headers: request.headers },
   });
@@ -43,6 +48,27 @@ export async function middleware(request: NextRequest) {
       url.pathname = "/login";
       url.searchParams.set("redirect", pathname);
       return NextResponse.redirect(url);
+    }
+
+    // ── Approval gate: block unapproved users from /partner/* ──
+    // Admins are always allowed through; only vendor/customer accounts need approval.
+    if (user && pathname.startsWith("/partner") && !isPublicPath) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, approved_status")
+        .eq("id", user.id)
+        .single();
+
+      if (
+        profile &&
+        profile.role !== "admin" &&
+        profile.role !== "rm" &&
+        profile.approved_status !== "approved"
+      ) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/pending-approval";
+        return NextResponse.redirect(url);
+      }
     }
   } catch {
     // Gracefully handle AbortError / lock steal — let the request continue

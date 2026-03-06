@@ -27,8 +27,10 @@ export async function GET(request: Request) {
             email: user.email!,
             phone: user.user_metadata?.phone || null,
             role: (role as "customer" | "vendor" | "admin" | "rm") ?? "customer",
+            // New OAuth user — requires super-admin approval before accessing platform
+            approved_status: "pending",
           },
-          { onConflict: "id", ignoreDuplicates: true }
+          { onConflict: "id", ignoreDuplicates: true } // existing approved users are NOT updated
         );
       } catch {
         // Non-fatal — profile may already exist

@@ -1,8 +1,9 @@
-import { getAllUsers } from "@/lib/actions";
+import { getAllUsers, getPendingUsers } from "@/lib/actions";
 import { Badge } from "@/components/ui/badge";
-import { Users, UserCheck, Building2, Shield, Phone, Mail } from "lucide-react";
+import { Users, UserCheck, Building2, Shield, Phone, Mail, Clock, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { UserRoleActions } from "./user-role-actions";
+import { ApprovalActions } from "./user-approval-actions";
 
 export const metadata = {
   title: "User Management | VivahSthal Admin",
@@ -21,7 +22,10 @@ export default async function AdminUsersPage({
   searchParams: Promise<Record<string, string>>;
 }) {
   const params = await searchParams;
-  const users = await getAllUsers({ role: params.role, q: params.q });
+  const [users, pendingUsers] = await Promise.all([
+    getAllUsers({ role: params.role, q: params.q }),
+    getPendingUsers(),
+  ]);
 
   const customerCount = users.filter((u: Record<string, unknown>) => u.role === "customer").length;
   const vendorCount = users.filter((u: Record<string, unknown>) => u.role === "vendor").length;
@@ -35,6 +39,61 @@ export default async function AdminUsersPage({
           Manage customers, vendors, and admin users
         </p>
       </div>
+
+      {/* ── Pending Approvals ── */}
+      {pendingUsers.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl overflow-hidden">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-amber-200">
+            <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center">
+              <AlertTriangle className="h-4 w-4 text-amber-600" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-amber-900 text-sm">
+                Pending Approvals ({pendingUsers.length})
+              </h2>
+              <p className="text-xs text-amber-700">
+                These users signed up and are waiting for your approval to access the platform.
+              </p>
+            </div>
+          </div>
+          <div className="divide-y divide-amber-100">
+            {pendingUsers.map((u: Record<string, unknown>) => (
+              <div key={u.id as string} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="h-10 w-10 rounded-full bg-amber-200 flex items-center justify-center text-amber-800 font-bold text-sm shrink-0 uppercase">
+                    {((u.full_name as string) || "U")[0]}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm text-gray-900 truncate">{u.full_name as string}</p>
+                    <div className="flex items-center gap-3 mt-0.5">
+                      <span className="flex items-center gap-1 text-xs text-gray-500">
+                        <Mail className="h-3 w-3" />{u.email as string}
+                      </span>
+                      {(u.phone as string | null) && (
+                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                          <Phone className="h-3 w-3" />{u.phone as string}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                    roleBadgeColors[(u.role as string)] || "bg-gray-100 text-gray-600"
+                  }`}>
+                    {u.role as string}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                    <Clock className="h-3 w-3" />
+                    {u.created_at ? format(new Date(u.created_at as string), "MMM d, yyyy") : "—"}
+                  </span>
+                  <ApprovalActions userId={u.id as string} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[

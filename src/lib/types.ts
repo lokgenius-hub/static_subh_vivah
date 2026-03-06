@@ -18,6 +18,8 @@ export type VenueType =
   | "convention_center"
   | "community_hall";
 
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
 export interface Profile {
   id: string;
   full_name: string;
@@ -27,6 +29,7 @@ export interface Profile {
   role: UserRole;
   city: string | null;
   assigned_rm_id: string | null;
+  approved_status: ApprovalStatus;
   created_at: string;
   updated_at: string;
 }

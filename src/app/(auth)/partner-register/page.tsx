@@ -428,17 +428,20 @@ export default function PartnerRegisterPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center py-4"
                   >
-                    <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                      <ShieldCheck className="h-8 w-8 text-green-600" />
+                    <div className="h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                      <ShieldCheck className="h-8 w-8 text-amber-600" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Registration Complete!</h3>
-                    <p className="text-gray-500 text-sm mb-6">
-                      Your partner account has been created successfully. Sign in to start listing your venues.
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Registration Submitted!</h3>
+                    <p className="text-gray-500 text-sm mb-2">
+                      Your partner account has been created successfully.
+                    </p>
+                    <p className="text-amber-600 text-sm font-medium mb-6">
+                      ⏳ Your account is pending super-admin approval. You will be able to access your dashboard once approved.
                     </p>
                     <Link href="/login">
                       <Button className="w-full">
                         <ArrowRight className="h-4 w-4" />
-                        Sign In Now
+                        Sign In
                       </Button>
                     </Link>
                   </motion.div>
