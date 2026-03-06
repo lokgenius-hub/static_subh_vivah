@@ -150,7 +150,10 @@ export async function getVenues(params: VenueSearchParams = {}) {
   query = query.range(from, from + limit - 1);
 
   const { data, error, count } = await query;
-  if (error) return { venues: [], total: 0 };
+  if (error) {
+    console.error("[getVenues] Supabase error:", error.message, error.code, error.hint);
+    throw new Error(`Supabase: ${error.message} (code: ${error.code})`);
+  }
   return { venues: (data as Venue[]) || [], total: count || 0 };
 }
 
