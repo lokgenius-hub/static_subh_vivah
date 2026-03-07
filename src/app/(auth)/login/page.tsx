@@ -100,11 +100,11 @@ function LoginForm() {
           .single();
 
         if (profile?.role === "vendor") {
-          window.location.href = "/partner/venues";
+          router.push("/partner/venues");
         } else if (profile?.role === "admin" || profile?.role === "rm") {
-          window.location.href = "/admin/leads";
+          router.push("/admin/leads");
         } else {
-          window.location.href = "/venues";
+          router.push("/venues");
         }
       }
     } catch (err: unknown) {
