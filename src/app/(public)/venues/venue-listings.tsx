@@ -29,7 +29,7 @@ export function VenueListings({
       const result = await Promise.race([
         getVenues(venueParams),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Request timed out — check Supabase secrets in GitHub Actions")), 12000)
+          setTimeout(() => reject(new Error("Request timed out — Supabase may be temporarily unreachable. Please try again.")), 12000)
         ),
       ]);
       setVenues(result.venues);
