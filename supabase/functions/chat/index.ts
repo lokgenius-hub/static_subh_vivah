@@ -1,9 +1,12 @@
 // Supabase Edge Function: /functions/v1/chat
-// Handles AI chat with GROQ (key stored as Edge Function secret, never in codebase)
-// Deploy: supabase functions deploy chat
+// Plain JSON response (no streaming) — works reliably with static Next.js export.
+//
+// Deploy:     supabase functions deploy chat
 // Set secret: supabase secrets set GROQ_API_KEY=gsk_...
+//
+// POST { messages: [{role, content}] }  →  { reply: "..." }
 
-import OpenAI from "npm:openai@4";
+// No npm imports needed — plain fetch to GROQ REST API
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,99 +15,96 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const SYSTEM_PROMPT = `You are VivahSthal's wedding venue assistant for Bihar and nearby regions of India.
-Help users:
-- Find venues by city, budget, capacity, and venue type
-- Understand pricing (per slot, per plate)
-- Learn about amenities and services
-- Know auspicious wedding dates (muhurat)
-- Plan their wedding timeline
+const SYSTEM_PROMPT = `You are VivahSthal's friendly wedding venue assistant for Kaimur District, Bihar, India.
 
-Be warm, helpful, and conversational. Use respectful language (you can mix Hindi greetings like "Namaste").
-Keep responses concise but informative. Always encourage users to submit an enquiry form for booking.
+Your job:
+- Help couples find the right marriage hall / lawn / vatika in Bhabua, Mohania, and nearby Kaimur towns
+- Answer questions about venue capacity, pricing, amenities, availability
+- Suggest venues based on budget and guest count
+- Share information about auspicious wedding dates (shubh muhurat)
+- Encourage users to fill the enquiry form for booking
 
-Key cities we cover: Patna, Gaya, Bhagalpur, Muzaffarpur, Bhabua, Aurangabad, Nalanda, and more in Bihar.
-Venue types: Banquet Hall, Farmhouse, Resort, Garden/Lawn, Hotel.
-Typical price range: ₹50,000 – ₹5,00,000 per slot.`;
+Personality: Warm, helpful, conversational. Mix Hindi phrases naturally (Ji, Namaste, Bahut badhiya, etc).
+Keep answers SHORT — 2-4 sentences max unless asked for detail.
+Always end with a helpful next step like "Enquiry form bharo" or "Contact karo".
+
+Price ranges in Kaimur: ₹30,000 – ₹3,00,000 per slot.
+Venue types: Marriage Hall, Vatika (Lawn), Palace, Resort.
+Cities covered: Bhabua, Mohania, Ramgarh, Chainpur, Durgawati.`;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
-
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405, headers: corsHeaders });
   }
 
   try {
-    const { messages } = await req.json();
+    const body = await req.json();
+
+    // Normalise messages — support both plain content and Vercel AI UIMessage parts format
+    type RawMsg = { role?: string; content?: string; parts?: Array<{type: string; text?: string}> };
+    let userMessages: Array<{ role: string; content: string }> = [];
+
+    if (Array.isArray(body.messages)) {
+      userMessages = (body.messages as RawMsg[]).map((m) => ({
+        role: m.role === "user" ? "user" : "assistant",
+        content: m.content
+          ? String(m.content)
+          : Array.isArray(m.parts)
+          ? m.parts.filter((p) => p.type === "text").map((p) => p.text ?? "").join("")
+          : "",
+      })).filter((m) => m.content.trim() !== "");
+    } else if (typeof body.message === "string") {
+      userMessages = [{ role: "user", content: body.message }];
+    }
 
     const groqApiKey = Deno.env.get("GROQ_API_KEY");
     if (!groqApiKey) {
       return new Response(
-        JSON.stringify({ error: "GROQ_API_KEY not configured in Edge Function secrets" }),
+        JSON.stringify({ error: "GROQ_API_KEY not configured. Run: supabase secrets set GROQ_API_KEY=gsk_..." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const groq = new OpenAI({
-      apiKey: groqApiKey,
-      baseURL: "https://api.groq.com/openai/v1",
-    });
-
-    // Build messages for Groq (filter to role/content only)
-    const chatMessages = [
-      { role: "system" as const, content: SYSTEM_PROMPT },
-      ...(messages || []).map((m: { role: string; content: string }) => ({
-        role: (m.role === "user" ? "user" : "assistant") as "user" | "assistant",
-        content: typeof m.content === "string"
-          ? m.content
-          : Array.isArray(m.content)
-          ? m.content.filter((p: { type: string }) => p.type === "text").map((p: { text: string }) => p.text).join("")
-          : String(m.content),
-      })),
-    ];
-
-    const stream = await groq.chat.completions.create({
-      model: "llama3-8b-8192",
-      messages: chatMessages,
-      stream: true,
-      max_tokens: 600,
-      temperature: 0.7,
-    });
-
-    // Stream response in Vercel AI SDK data stream v1 format
-    const readableStream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
-        try {
-          for await (const chunk of stream) {
-            const text = chunk.choices[0]?.delta?.content ?? "";
-            if (text) {
-              // AI SDK data stream format: 0:"escaped_text"\n
-              controller.enqueue(encoder.encode(`0:${JSON.stringify(text)}\n`));
-            }
-          }
-          // Finish signal
-          controller.enqueue(encoder.encode(`d:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0}}\n`));
-        } catch (err) {
-          controller.error(err);
-        } finally {
-          controller.close();
-        }
-      },
-    });
-
-    return new Response(readableStream, {
+    const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
       headers: {
-        ...corsHeaders,
-        "Content-Type": "text/plain; charset=utf-8",
-        "x-vercel-ai-data-stream": "v1",
-        "Transfer-Encoding": "chunked",
+        Authorization: `Bearer ${groqApiKey}`,
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        model: "llama3-8b-8192",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...userMessages,
+        ],
+        max_tokens: 400,
+        temperature: 0.7,
+      }),
     });
-  } catch (error) {
-    console.error("Chat Edge Function error:", error);
+
+    if (!groqRes.ok) {
+      const errText = await groqRes.text();
+      console.error("GROQ error:", errText);
+      return new Response(
+        JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const data = await groqRes.json();
+    const reply = data.choices?.[0]?.message?.content
+      ?? "Maafi chahta hun, abhi jawab nahi de pa raha. Thodi der mein try karein. 🙏";
+
+    return new Response(JSON.stringify({ reply }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
+  } catch (err) {
+    console.error("Chat edge function error:", err);
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

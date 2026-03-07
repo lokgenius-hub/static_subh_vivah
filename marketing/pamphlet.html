@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VivahSthal — Pamphlet (Print Ready A5)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 40px 20px;
+    }
+
+    h1.print-label {
+      font-size: 13px;
+      color: #888;
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ===== A5 PAGE ===== */
+    .a5 {
+      width: 148mm;
+      min-height: 210mm;
+      background: white;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+    }
+
+    /* ==================== FRONT SIDE ==================== */
+    .front { background: white; }
+
+    .front .top-strip {
+      background: linear-gradient(135deg, #c62a47 0%, #7b1029 100%);
+      padding: 26px 24px 20px;
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .front .top-strip::after {
+      content: '💒';
+      position: absolute;
+      font-size: 120px;
+      opacity: 0.07;
+      right: -10px;
+      top: -15px;
+    }
+
+    .front .logo-text {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .front .logo-text span { color: #ffd700; }
+
+    .front .top-strip .sub {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: 5px;
+      letter-spacing: 0.5px;
+    }
+
+    .wave {
+      width: 100%;
+      height: 30px;
+      background: linear-gradient(135deg, #c62a47 0%, #7b1029 100%);
+      clip-path: ellipse(55% 100% at 50% 0%);
+    }
+
+    .front .hero-text {
+      text-align: center;
+      padding: 14px 20px 10px;
+    }
+
+    .front .hero-text h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #1a1a2e;
+      line-height: 1.3;
+    }
+
+    .front .hero-text h2 span { color: #c62a47; }
+
+    .front .hero-text p {
+      font-size: 11.5px;
+      color: #666;
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #c62a47;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0 20px;
+      margin: 14px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #f0d0d5;
+    }
+
+    /* Feature list */
+    .feature-list {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 12px;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .feature-item .icon {
+      width: 26px;
+      height: 26px;
+      min-width: 26px;
+      background: linear-gradient(135deg, #ffe0e6, #ffc8d3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    /* How it works */
+    .steps-row {
+      display: flex;
+      gap: 0;
+      padding: 0 16px;
+      margin-top: 4px;
+    }
+
+    .how-step {
+      flex: 1;
+      text-align: center;
+      padding: 10px 6px;
+      position: relative;
+    }
+
+    .how-step:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #c62a47;
+      font-size: 14px;
+    }
+
+    .how-step .num {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #c62a47, #8b1a2f);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      margin: 0 auto 6px;
+    }
+
+    .how-step p {
+      font-size: 10px;
+      color: #555;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    /* CTA box */
+    .cta-box {
+      margin: 14px 16px;
+      background: linear-gradient(135deg, #c62a47, #8b1a2f);
+      border-radius: 14px;
+      padding: 16px 20px;
+      color: white;
+      text-align: center;
+    }
+
+    .cta-box .site-url {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .cta-box p {
+      font-size: 10.5px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .cta-box .qr-hint {
+      font-size: 10px;
+      opacity: 0.7;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* Bottom strip */
+    .bottom-strip {
+      background: #1a1a2e;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      font-size: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .bottom-strip span { color: #ffd700; }
+
+    /* ==================== BACK SIDE ==================== */
+    .back {
+      background: #fff9fa;
+    }
+
+    .back .top-strip {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d5e 100%);
+      padding: 22px 24px;
+      color: white;
+      text-align: center;
+    }
+
+    .back .top-strip h2 {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .back .top-strip h2 span { color: #ffd700; }
+
+    .back .top-strip p {
+      font-size: 11px;
+      opacity: 0.75;
+      margin-top: 5px;
+    }
+
+    .benefit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 16px;
+    }
+
+    .benefit-card {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      text-align: center;
+    }
+
+    .benefit-card .emoji { font-size: 24px; margin-bottom: 6px; }
+
+    .benefit-card h4 {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+
+    .benefit-card p {
+      font-size: 10px;
+      color: #777;
+      line-height: 1.4;
+    }
+
+    .free-badge-row {
+      padding: 0 16px;
+      margin-bottom: 4px;
+    }
+
+    .free-badge {
+      background: linear-gradient(135deg, #43a047, #2e7d32);
+      color: white;
+      border-radius: 12px;
+      padding: 14px 20px;
+      text-align: center;
+    }
+
+    .free-badge h3 {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .free-badge p {
+      font-size: 11px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .trust-row {
+      display: flex;
+      justify-content: space-around;
+      padding: 14px 16px;
+    }
+
+    .trust-item {
+      text-align: center;
+    }
+
+    .trust-item .num {
+      font-size: 22px;
+      font-weight: 800;
+      color: #c62a47;
+    }
+
+    .trust-item p {
+      font-size: 10px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    .contact-box {
+      margin: 0 16px 14px;
+      background: #1a1a2e;
+      color: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .contact-box h4 {
+      font-size: 12px;
+      color: #ffd700;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .contact-line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .contact-line span:first-child {
+      font-size: 16px;
+      width: 22px;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        gap: 0;
+      }
+      h1.print-label { display: none; }
+      .a5 {
+        box-shadow: none;
+        margin: 0;
+        width: 148mm;
+        min-height: 210mm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="print-label">📄 Pamphlet — Side 1 (Customer / Couple ke liye) — A5 Print</h1>
+
+  <!-- ======= FRONT SIDE ======= -->
+  <div class="a5 front">
+    <div class="top-strip">
+      <div class="logo-text">Vivah<span>Sthal</span></div>
+      <div class="sub">Kaimur District ka No.1 Wedding Venue Platform</div>
+    </div>
+
+    <div class="hero-text">
+      <h2>Apni <span>Shaadi</span> ke liye<br/>Best Venue Dhundo — Aasaani se!</h2>
+      <p>Bhabua aur Kaimur ke sabse acche marriage halls, vatika aur palaces —<br/>ek jagah pe. Free mein. Bina kisi agent ke.</p>
+    </div>
+
+    <div class="section-title">Hamaari Khaasiyat</div>
+
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="icon">🏛️</div>
+        <div><strong>20+ Venues</strong> — Bhabua, Mohania, Sasaram ke verified marriage halls aur lawns</div>
+      </div>
+      <div class="feature-item">
+        <div class="icon">📸</div>
+        <div><strong>Real Photos</strong> — Har venue ki asli photos, capacity, aur price dekho</div>
+      </div>
+      <div class="feature-item">
+        <div class="icon">📍</div>
+        <div><strong>Google Maps</strong> — Location map aur directions seedhe phone pe</div>
+      </div>
+      <div class="feature-item">
+        <div class="icon">📞</div>
+        <div><strong>Direct Contact</strong> — Koi middleman nahi, seedha venue se baat karo</div>
+      </div>
+      <div class="feature-item">
+        <div class="icon">🤖</div>
+        <div><strong>AI Chatbot</strong> — Budget batao, venue suggest ho jaayega 5 second mein</div>
+      </div>
+    </div>
+
+    <div class="section-title">Kaise Kaam Karta Hai?</div>
+
+    <div class="steps-row">
+      <div class="how-step">
+        <div class="num">1</div>
+        <p>Site Kholo</p>
+      </div>
+      <div class="how-step">
+        <div class="num">2</div>
+        <p>Venue Dekho &amp; Compare Karo</p>
+      </div>
+      <div class="how-step">
+        <div class="num">3</div>
+        <p>Enquiry Bhejo</p>
+      </div>
+      <div class="how-step">
+        <div class="num">4</div>
+        <p>Booking Pakki!</p>
+      </div>
+    </div>
+
+    <div class="cta-box">
+      <div class="site-url">🌐 vivahsthal.in</div>
+      <p>Abhi Visit Karein — Bilkul FREE</p>
+      <div class="qr-hint">📱 Phone pe search karein "VivahSthal Bhabua"</div>
+    </div>
+
+    <div class="bottom-strip">
+      Bhabua, Kaimur — Bihar &nbsp;|&nbsp; <span>Har Shaadi, Hamaari Zimmedaari</span>
+    </div>
+  </div>
+
+  <!-- ======= BACK SIDE ======= -->
+  <h1 class="print-label">📄 Pamphlet — Side 2 (Venue Owner ke liye) — A5 Print</h1>
+
+  <div class="a5 back">
+    <div class="top-strip" style="background: linear-gradient(135deg, #1a1a2e 0%, #2d2d5e 100%);">
+      <h2>🏢 Venue <span style="color:#ffd700">Owner</span> Hain Aap?</h2>
+      <p>Apni Marriage Hall / Lawn / Vatika VivahSthal pe <strong>FREE</strong> mein Register Karein</p>
+    </div>
+
+    <div class="benefit-grid">
+      <div class="benefit-card">
+        <div class="emoji">📲</div>
+        <h4>Direct Leads</h4>
+        <p>Customer seedha aapko WhatsApp / call karega — koi commission nahi</p>
+      </div>
+      <div class="benefit-card">
+        <div class="emoji">🗺️</div>
+        <h4>Google Maps Profile</h4>
+        <p>Aapki location, photos aur details ek jagah pe online</p>
+      </div>
+      <div class="benefit-card">
+        <div class="emoji">📊</div>
+        <h4>Partner Dashboard</h4>
+        <p>Bookings track karo, calendar update karo, apni profile manage karo</p>
+      </div>
+      <div class="benefit-card">
+        <div class="emoji">🔔</div>
+        <h4>Instant Alerts</h4>
+        <p>Naye enquiry aate hi aapko notification milega</p>
+      </div>
+    </div>
+
+    <div class="free-badge-row">
+      <div class="free-badge">
+        <h3>🎉 Pehle 6 Mahine — BILKUL FREE!</h3>
+        <p>Koi hidden charge nahi. Koi contract nahi. Bas register karo aur leads paao.</p>
+      </div>
+    </div>
+
+    <div class="trust-row">
+      <div class="trust-item">
+        <div class="num">20+</div>
+        <p>Listed<br/>Venues</p>
+      </div>
+      <div class="trust-item">
+        <div class="num">100%</div>
+        <p>Free<br/>Listing</p>
+      </div>
+      <div class="trust-item">
+        <div class="num">₹0</div>
+        <p>Commission<br/>on Leads</p>
+      </div>
+      <div class="trust-item">
+        <div class="num">24/7</div>
+        <p>Online<br/>Presence</p>
+      </div>
+    </div>
+
+    <div class="contact-box">
+      <h4>📩 Abhi Register Karein Ya Hum Se Milein</h4>
+      <div class="contact-line">
+        <span>🌐</span>
+        <span>vivahsthal.in</span>
+      </div>
+      <div class="contact-line">
+        <span>📱</span>
+        <span>WhatsApp: [Aapka Number Yahan]</span>
+      </div>
+      <div class="contact-line">
+        <span>📧</span>
+        <span>bhabuasavvy@gmail.com</span>
+      </div>
+      <div class="contact-line">
+        <span>📍</span>
+        <span>Bhabua, Kaimur, Bihar</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

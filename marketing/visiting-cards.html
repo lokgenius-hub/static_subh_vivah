@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VivahSthal — Visiting Cards (Print Ready)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #d8d8d8;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 50px;
+    }
+
+    h1.section-label {
+      font-size: 12px;
+      color: #777;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    /* Grid to print 8 per A4 sheet */
+    .card-sheet {
+      background: white;
+      width: 210mm;
+      padding: 12mm;
+      display: grid;
+      grid-template-columns: repeat(2, 90mm);
+      grid-template-rows: repeat(4, 55mm);
+      gap: 6mm;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    }
+
+    /* ===== CARD BASE ===== */
+    .card {
+      width: 90mm;
+      height: 55mm;
+      border-radius: 4mm;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ===== FRONT CARD ===== */
+    .card-front {
+      background: linear-gradient(135deg, #c62a47 0%, #7b1029 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 6mm 7mm;
+      color: white;
+    }
+
+    .card-front::before {
+      content: '💒';
+      position: absolute;
+      font-size: 80px;
+      opacity: 0.06;
+      right: -5px;
+      top: -5px;
+    }
+
+    .card-front .top-section .logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .card-front .top-section .logo span { color: #ffd700; }
+
+    .card-front .top-section .tagline {
+      font-size: 7.5px;
+      opacity: 0.75;
+      margin-top: 2px;
+      letter-spacing: 0.3px;
+    }
+
+    .card-front .divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(255,255,255,0.2);
+      margin: 3mm 0;
+    }
+
+    .card-front .person-name {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .card-front .person-title {
+      font-size: 8.5px;
+      opacity: 0.7;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .card-front .bottom-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .card-front .contact-mini {
+      font-size: 7.5px;
+      opacity: 0.8;
+      line-height: 1.8;
+    }
+
+    .card-front .contact-mini strong {
+      font-size: 8.5px;
+      opacity: 1;
+      color: #ffd700;
+    }
+
+    .card-front .site-url {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 3px 9px;
+      white-space: nowrap;
+    }
+
+    /* ===== BACK CARD (Dark / Info) ===== */
+    .card-back {
+      background: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 5mm 7mm;
+      color: white;
+      text-align: center;
+    }
+
+    .card-back::before {
+      content: '';
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(198,42,71,0.3), transparent);
+      top: -10px;
+      left: -10px;
+    }
+
+    .card-back::after {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(198,42,71,0.2), transparent);
+      bottom: -15px;
+      right: -15px;
+    }
+
+    .card-back .headline {
+      font-size: 12px;
+      font-weight: 800;
+      color: #ffd700;
+      line-height: 1.3;
+      margin-bottom: 3mm;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-back .features {
+      font-size: 8px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-back .features strong {
+      color: white;
+    }
+
+    .card-back .cta {
+      margin-top: 3mm;
+      font-size: 9px;
+      background: #c62a47;
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-back .logo-small {
+      font-size: 11px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 2mm;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-back .logo-small span { color: #ffd700; }
+
+    /* ===== PARTNER CARD FRONT ===== */
+    .card-partner-front {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d3561 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 6mm 7mm;
+      color: white;
+      position: relative;
+    }
+
+    .card-partner-front::before {
+      content: '🏢';
+      position: absolute;
+      font-size: 90px;
+      opacity: 0.05;
+      right: -5px;
+      bottom: -5px;
+    }
+
+    .card-partner-front .logo {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .card-partner-front .logo span { color: #ffd700; }
+
+    .card-partner-front .headline {
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: #ffd700;
+    }
+
+    .card-partner-front .sub {
+      font-size: 8px;
+      opacity: 0.65;
+      margin-top: 1mm;
+    }
+
+    .card-partner-front .free-tag {
+      display: inline-block;
+      background: #43a047;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-bottom: 1mm;
+    }
+
+    .card-partner-front .list {
+      font-size: 8px;
+      line-height: 1.9;
+      opacity: 0.8;
+    }
+
+    .card-partner-front .site-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-partner-front .site-row .url {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 3px 10px;
+    }
+
+    .card-partner-front .site-row .contact {
+      font-size: 8px;
+      opacity: 0.65;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        gap: 0;
+      }
+      h1.section-label { display: none; }
+      .card-sheet {
+        box-shadow: none;
+        width: 210mm;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="section-label">📇 Visiting Cards — Personal (Front + Back) × 4 — A4 Sheet</h1>
+
+  <!-- Sheet 1: Personal Card — Front -->
+  <div class="card-sheet">
+
+    <!-- 4 FRONT cards -->
+    <div class="card card-front">
+      <div class="top-section">
+        <div class="logo">Vivah<span>Sthal</span></div>
+        <div class="tagline">Kaimur ka No.1 Wedding Venue Platform</div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="person-name">[Aapka Naam Yahan]</div>
+        <div class="person-title">Founder &amp; CEO — VivahSthal</div>
+      </div>
+      <div class="bottom-section">
+        <div class="contact-mini">
+          <strong>📱</strong> [Aapka Mobile Number]<br/>
+          <strong>✉️</strong> bhabuasavvy@gmail.com<br/>
+          <strong>📍</strong> Bhabua, Kaimur, Bihar
+        </div>
+        <div class="site-url">🌐 vivahsthal.in</div>
+      </div>
+    </div>
+
+    <div class="card card-front">
+      <div class="top-section">
+        <div class="logo">Vivah<span>Sthal</span></div>
+        <div class="tagline">Kaimur ka No.1 Wedding Venue Platform</div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="person-name">[Aapka Naam Yahan]</div>
+        <div class="person-title">Founder &amp; CEO — VivahSthal</div>
+      </div>
+      <div class="bottom-section">
+        <div class="contact-mini">
+          <strong>📱</strong> [Aapka Mobile Number]<br/>
+          <strong>✉️</strong> bhabuasavvy@gmail.com<br/>
+          <strong>📍</strong> Bhabua, Kaimur, Bihar
+        </div>
+        <div class="site-url">🌐 vivahsthal.in</div>
+      </div>
+    </div>
+
+    <div class="card card-front">
+      <div class="top-section">
+        <div class="logo">Vivah<span>Sthal</span></div>
+        <div class="tagline">Kaimur ka No.1 Wedding Venue Platform</div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="person-name">[Aapka Naam Yahan]</div>
+        <div class="person-title">Founder &amp; CEO — VivahSthal</div>
+      </div>
+      <div class="bottom-section">
+        <div class="contact-mini">
+          <strong>📱</strong> [Aapka Mobile Number]<br/>
+          <strong>✉️</strong> bhabuasavvy@gmail.com<br/>
+          <strong>📍</strong> Bhabua, Kaimur, Bihar
+        </div>
+        <div class="site-url">🌐 vivahsthal.in</div>
+      </div>
+    </div>
+
+    <div class="card card-front">
+      <div class="top-section">
+        <div class="logo">Vivah<span>Sthal</span></div>
+        <div class="tagline">Kaimur ka No.1 Wedding Venue Platform</div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="person-name">[Aapka Naam Yahan]</div>
+        <div class="person-title">Founder &amp; CEO — VivahSthal</div>
+      </div>
+      <div class="bottom-section">
+        <div class="contact-mini">
+          <strong>📱</strong> [Aapka Mobile Number]<br/>
+          <strong>✉️</strong> bhabuasavvy@gmail.com<br/>
+          <strong>📍</strong> Bhabua, Kaimur, Bihar
+        </div>
+        <div class="site-url">🌐 vivahsthal.in</div>
+      </div>
+    </div>
+
+    <!-- 4 BACK cards -->
+    <div class="card card-back">
+      <div class="logo-small">Vivah<span>Sthal</span></div>
+      <div class="headline">Bhabua ki Har Shaadi ka<br/>Best Venue — Ek Jagah Pe!</div>
+      <div class="features">
+        <strong>✅ 20+ Verified Venues</strong> in Kaimur District<br/>
+        <strong>📍 Google Maps</strong> &amp; Directions<br/>
+        <strong>📞 Direct Contact</strong> — Koi Commission Nahi<br/>
+        <strong>🤖 AI Chatbot</strong> — Budget se Venue Suggest
+      </div>
+      <div class="cta">🌐 vivahsthal.in — FREE Visit Karein</div>
+    </div>
+
+    <div class="card card-back">
+      <div class="logo-small">Vivah<span>Sthal</span></div>
+      <div class="headline">Bhabua ki Har Shaadi ka<br/>Best Venue — Ek Jagah Pe!</div>
+      <div class="features">
+        <strong>✅ 20+ Verified Venues</strong> in Kaimur District<br/>
+        <strong>📍 Google Maps</strong> &amp; Directions<br/>
+        <strong>📞 Direct Contact</strong> — Koi Commission Nahi<br/>
+        <strong>🤖 AI Chatbot</strong> — Budget se Venue Suggest
+      </div>
+      <div class="cta">🌐 vivahsthal.in — FREE Visit Karein</div>
+    </div>
+
+    <div class="card card-back">
+      <div class="logo-small">Vivah<span>Sthal</span></div>
+      <div class="headline">Bhabua ki Har Shaadi ka<br/>Best Venue — Ek Jagah Pe!</div>
+      <div class="features">
+        <strong>✅ 20+ Verified Venues</strong> in Kaimur District<br/>
+        <strong>📍 Google Maps</strong> &amp; Directions<br/>
+        <strong>📞 Direct Contact</strong> — Koi Commission Nahi<br/>
+        <strong>🤖 AI Chatbot</strong> — Budget se Venue Suggest
+      </div>
+      <div class="cta">🌐 vivahsthal.in — FREE Visit Karein</div>
+    </div>
+
+    <div class="card card-back">
+      <div class="logo-small">Vivah<span>Sthal</span></div>
+      <div class="headline">Bhabua ki Har Shaadi ka<br/>Best Venue — Ek Jagah Pe!</div>
+      <div class="features">
+        <strong>✅ 20+ Verified Venues</strong> in Kaimur District<br/>
+        <strong>📍 Google Maps</strong> &amp; Directions<br/>
+        <strong>📞 Direct Contact</strong> — Koi Commission Nahi<br/>
+        <strong>🤖 AI Chatbot</strong> — Budget se Venue Suggest
+      </div>
+      <div class="cta">🌐 vivahsthal.in — FREE Visit Karein</div>
+    </div>
+
+  </div>
+
+  <!-- ===== PARTNER CARDS SHEET ===== -->
+  <h1 class="section-label">📇 Visiting Cards — Venue Owners ke liye (Front) × 4 — A4 Sheet</h1>
+
+  <div class="card-sheet">
+
+    <div class="card card-partner-front">
+      <div class="logo">Vivah<span>Sthal</span></div>
+      <div>
+        <div class="free-tag">🎉 FREE Listing — 6 Mahine</div>
+        <div class="headline">Apni Venue VivahSthal pe Register Karein</div>
+        <div class="sub">Aur paiye direct wedding leads — koi commission nahi!</div>
+      </div>
+      <div class="list">
+        ✅ Professional Venue Profile with Photos<br/>
+        📲 Instant Lead Notifications on WhatsApp<br/>
+        📊 Partner Dashboard — Manage Everything
+      </div>
+      <div class="site-row">
+        <div class="url">🌐 vivahsthal.in</div>
+        <div class="contact">📱 [Aapka Number]<br/>📍 Bhabua, Bihar</div>
+      </div>
+    </div>
+
+    <div class="card card-partner-front">
+      <div class="logo">Vivah<span>Sthal</span></div>
+      <div>
+        <div class="free-tag">🎉 FREE Listing — 6 Mahine</div>
+        <div class="headline">Apni Venue VivahSthal pe Register Karein</div>
+        <div class="sub">Aur paiye direct wedding leads — koi commission nahi!</div>
+      </div>
+      <div class="list">
+        ✅ Professional Venue Profile with Photos<br/>
+        📲 Instant Lead Notifications on WhatsApp<br/>
+        📊 Partner Dashboard — Manage Everything
+      </div>
+      <div class="site-row">
+        <div class="url">🌐 vivahsthal.in</div>
+        <div class="contact">📱 [Aapka Number]<br/>📍 Bhabua, Bihar</div>
+      </div>
+    </div>
+
+    <div class="card card-partner-front">
+      <div class="logo">Vivah<span>Sthal</span></div>
+      <div>
+        <div class="free-tag">🎉 FREE Listing — 6 Mahine</div>
+        <div class="headline">Apni Venue VivahSthal pe Register Karein</div>
+        <div class="sub">Aur paiye direct wedding leads — koi commission nahi!</div>
+      </div>
+      <div class="list">
+        ✅ Professional Venue Profile with Photos<br/>
+        📲 Instant Lead Notifications on WhatsApp<br/>
+        📊 Partner Dashboard — Manage Everything
+      </div>
+      <div class="site-row">
+        <div class="url">🌐 vivahsthal.in</div>
+        <div class="contact">📱 [Aapka Number]<br/>📍 Bhabua, Bihar</div>
+      </div>
+    </div>
+
+    <div class="card card-partner-front">
+      <div class="logo">Vivah<span>Sthal</span></div>
+      <div>
+        <div class="free-tag">🎉 FREE Listing — 6 Mahine</div>
+        <div class="headline">Apni Venue VivahSthal pe Register Karein</div>
+        <div class="sub">Aur paiye direct wedding leads — koi commission nahi!</div>
+      </div>
+      <div class="list">
+        ✅ Professional Venue Profile with Photos<br/>
+        📲 Instant Lead Notifications on WhatsApp<br/>
+        📊 Partner Dashboard — Manage Everything
+      </div>
+      <div class="site-row">
+        <div class="url">🌐 vivahsthal.in</div>
+        <div class="contact">📱 [Aapka Number]<br/>📍 Bhabua, Bihar</div>
+      </div>
+    </div>
+
+    <!-- 4 back cards for partner -->
+    <div class="card card-back">
+      <div class="logo-small">Vivah<span>Sthal</span></div>
+      <div class="headline">Venue Listing — 100% FREE<br/>Pehle 6 Mahine!</div>
+      <div class="features">
+        <strong>📞 Direct Leads</strong> — Koi Middleman Nahi<br/>
+        <strong>📸 Photo Gallery</strong> — Professional Presence<br/>
+        <strong>📊 Dashboard</strong> — Sab Kuch Track Karo<br/>
+        <strong>🔔 Instant Alerts</strong> — Enquiry pe Notification
+      </div>
+      <div class="cta">Register: vivahsthal.in</div>
+    </div>
+
+    <div class="card card-back">
+      <div class="logo-small">Vivah<span>Sthal</span></div>
+      <div class="headline">Venue Listing — 100% FREE<br/>Pehle 6 Mahine!</div>
+      <div class="features">
+        <strong>📞 Direct Leads</strong> — Koi Middleman Nahi<br/>
+        <strong>📸 Photo Gallery</strong> — Professional Presence<br/>
+        <strong>📊 Dashboard</strong> — Sab Kuch Track Karo<br/>
+        <strong>🔔 Instant Alerts</strong> — Enquiry pe Notification
+      </div>
+      <div class="cta">Register: vivahsthal.in</div>
+    </div>
+
+    <div class="card card-back">
+      <div class="logo-small">Vivah<span>Sthal</span></div>
+      <div class="headline">Venue Listing — 100% FREE<br/>Pehle 6 Mahine!</div>
+      <div class="features">
+        <strong>📞 Direct Leads</strong> — Koi Middleman Nahi<br/>
+        <strong>📸 Photo Gallery</strong> — Professional Presence<br/>
+        <strong>📊 Dashboard</strong> — Sab Kuch Track Karo<br/>
+        <strong>🔔 Instant Alerts</strong> — Enquiry pe Notification
+      </div>
+      <div class="cta">Register: vivahsthal.in</div>
+    </div>
+
+    <div class="card card-back">
+      <div class="logo-small">Vivah<span>Sthal</span></div>
+      <div class="headline">Venue Listing — 100% FREE<br/>Pehle 6 Mahine!</div>
+      <div class="features">
+        <strong>📞 Direct Leads</strong> — Koi Middleman Nahi<br/>
+        <strong>📸 Photo Gallery</strong> — Professional Presence<br/>
+        <strong>📊 Dashboard</strong> — Sab Kuch Track Karo<br/>
+        <strong>🔔 Instant Alerts</strong> — Enquiry pe Notification
+      </div>
+      <div class="cta">Register: vivahsthal.in</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

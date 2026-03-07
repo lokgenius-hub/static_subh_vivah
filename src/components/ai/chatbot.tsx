@@ -1,67 +1,93 @@
 "use client";
 
 import { useState, useRef, useEffect, type FormEvent } from "react";
-import { useChat } from "@ai-sdk/react";
-import type { UIMessage } from "ai";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Sparkles, Bot, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-function getMessageText(message: { parts: Array<{ type: string; text?: string }> }): string {
-  return message.parts
-    .filter((p) => p.type === "text" && p.text)
-    .map((p) => p.text)
-    .join("");
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
 }
 
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  "https://qvuxmnysvmebwpiupink.supabase.co";
+const SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2dXhtbnlzdm1lYndwaXVwaW5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0MjkxNzQsImV4cCI6MjA4ODAwNTE3NH0.hT0XA9KvGk-tEwOM2L1rNCddgDP55gOeNHFBQ6qMWRc";
+
 export function AIChatbot() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+  const [isOpen, setIsOpen]     = useState(false);
+  const [inputValue, setInput]  = useState("");
+  const [isLoading, setLoading] = useState(false);
+  const [chatError, setChatError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const initialMsgs: UIMessage[] = [
-    {
-      id: "welcome",
-      role: "assistant",
-      parts: [
-        {
-          type: "text" as const,
-          text: "Namaste! 🙏 I'm your VivahSthal Wedding Assistant. Congratulations on your upcoming celebration! 🎉\n\nI can help you:\n• Find the perfect venue by city, budget & capacity\n• Check availability for auspicious dates\n• Connect you with our specialist team\n\nWhat are you looking for?",
-        },
-      ],
-    },
-  ];
+  const WELCOME: ChatMessage = {
+    id: "welcome",
+    role: "assistant",
+    content:
+      "Namaste! 🙏 Main hoon aapka VivahSthal Wedding Assistant!\n\nMain aapki madad kar sakta hun:\n" +
+      "• Bhabua / Kaimur ke best venues dhundne mein\n" +
+      "• Budget aur capacity ke hisaab se suggest karne mein\n" +
+      "• Shubh muhurat aur booking process samjhane mein\n\nBataiye, kya dhundh rahe hain? 😊",
+  };
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  const { messages, sendMessage, status, error } = useChat({
-    id: "vivahsthal-chat",
-    api: `${supabaseUrl}/functions/v1/chat`,
-    headers: {
-      Authorization: `Bearer ${supabaseAnonKey}`,
-      apikey: supabaseAnonKey ?? "",
-    },
-    messages: initialMsgs,
-  });
-
-  const isLoading = status === "submitted" || status === "streaming";
+  const [messages, setMessages] = useState<ChatMessage[]>([WELCOME]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isLoading]);
 
-  const handleFormSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim() || isLoading) return;
-    const text = inputValue;
-    setInputValue("");
-    await sendMessage({ text });
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || isLoading) return;
+
+    const userMsg: ChatMessage = { id: Date.now().toString(), role: "user", content: text };
+    const updated = [...messages, userMsg];
+    setMessages(updated);
+    setInput("");
+    setLoading(true);
+    setChatError("");
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          apikey: SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          messages: updated.map((m) => ({ role: m.role, content: m.content })),
+        }),
+      });
+
+      const data = await res.json();
+      const reply: string =
+        data.reply ??
+        data.error ??
+        "Kuch gadbad ho gayi. Please thodi der mein try karein.";
+
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now().toString() + "_a", role: "assistant", content: reply },
+      ]);
+    } catch {
+      setChatError("Network error — please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSuggestionClick = async (suggestion: string) => {
-    setInputValue("");
-    await sendMessage({ text: suggestion });
+  const handleFormSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    sendMessage(inputValue);
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    sendMessage(suggestion);
   };
 
   return (
@@ -117,40 +143,36 @@ export function AIChatbot() {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
-              {messages.map((message) => {
-                const text = getMessageText(message as { parts: Array<{ type: string; text?: string }> });
-                if (!text) return null;
-                return (
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={cn(
+                    "flex gap-2.5",
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  )}
+                >
+                  {message.role === "assistant" && (
+                    <div className="h-7 w-7 rounded-full bg-gradient-primary flex items-center justify-center shrink-0 mt-0.5">
+                      <Bot className="h-3.5 w-3.5 text-white" />
+                    </div>
+                  )}
                   <div
-                    key={message.id}
                     className={cn(
-                      "flex gap-2.5",
-                      message.role === "user" ? "justify-end" : "justify-start"
+                      "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+                      message.role === "user"
+                        ? "bg-[var(--color-charcoal)] text-white rounded-br-md"
+                        : "bg-gray-100 text-gray-800 rounded-bl-md"
                     )}
                   >
-                    {message.role === "assistant" && (
-                      <div className="h-7 w-7 rounded-full bg-gradient-primary flex items-center justify-center shrink-0 mt-0.5">
-                        <Bot className="h-3.5 w-3.5 text-white" />
-                      </div>
-                    )}
-                    <div
-                      className={cn(
-                        "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-                        message.role === "user"
-                          ? "bg-[var(--color-charcoal)] text-white rounded-br-md"
-                          : "bg-gray-100 text-gray-800 rounded-bl-md"
-                      )}
-                    >
-                      <p className="whitespace-pre-wrap">{text}</p>
-                    </div>
-                    {message.role === "user" && (
-                      <div className="h-7 w-7 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <User className="h-3.5 w-3.5 text-[var(--color-primary)]" />
-                      </div>
-                    )}
+                    <p className="whitespace-pre-wrap">{message.content}</p>
                   </div>
-                );
-              })}
+                  {message.role === "user" && (
+                    <div className="h-7 w-7 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <User className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+                    </div>
+                  )}
+                </div>
+              ))}
               {isLoading && (
                 <div className="flex gap-2.5">
                   <div className="h-7 w-7 rounded-full bg-gradient-primary flex items-center justify-center shrink-0">
@@ -164,6 +186,9 @@ export function AIChatbot() {
                     </div>
                   </div>
                 </div>
+              )}
+              {chatError && (
+                <p className="text-center text-xs text-red-500 py-1">{chatError}</p>
               )}
               <div ref={messagesEndRef} />
             </div>
@@ -196,7 +221,7 @@ export function AIChatbot() {
             >
               <input
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your message..."
                 className="flex-1 h-10 px-4 rounded-full bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 placeholder:text-gray-400"
                 disabled={isLoading}
