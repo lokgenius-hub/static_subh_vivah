@@ -78,9 +78,10 @@ export async function upgradeToVendor(): Promise<{ error: string | null }> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: "Not logged in" };
 
+    // Set role to vendor but mark as pending — admin must approve before dashboard access
     const { error } = await supabase
       .from("profiles")
-      .update({ role: "vendor" })
+      .update({ role: "vendor", approved_status: "pending" })
       .eq("id", user.id);
     if (error) return { error: error.message };
 

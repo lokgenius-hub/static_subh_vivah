@@ -57,12 +57,13 @@ export default function PartnerRegisterPage() {
     setLoading(true);
     setError("");
     const result = await upgradeToVendor();
+    setLoading(false);
     if (result.error) {
       setError(result.error);
-      setLoading(false);
       return;
     }
-    window.location.href = "/partner/venues";
+    // Always show pending approval screen — admin must verify before partner can access dashboard
+    setStep("success");
   };
 
   const handleSendOtp = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -154,12 +155,9 @@ export default function PartnerRegisterPage() {
       return;
     }
 
-    if (result.needsConfirmation) {
-      setStep("success");
-      setInfo("Registration successful! Your account has been created.");
-    } else {
-      window.location.href = "/partner/venues";
-    }
+    // Always show pending approval screen — admin must verify before partner accesses dashboard
+    setStep("success");
+    setInfo("Registration successful! Your account has been created.");
   };
 
   const handleResendOtp = async () => {

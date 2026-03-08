@@ -29,6 +29,32 @@ export default function PartnerLayout({
 
   if (!user) return null;
 
+  // Show pending approval screen for vendors awaiting admin verification
+  const approvedStatus = (profile as Record<string, unknown> | null)?.approved_status as string | undefined;
+  const effectiveRole = profile?.role ?? (user.user_metadata?.role as string | undefined);
+  if (effectiveRole === "vendor" && approvedStatus && approvedStatus !== "approved") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--color-cream)] px-4">
+        <div className="max-w-md w-full text-center bg-white rounded-2xl shadow-xl p-10 border border-gray-100">
+          <div className="h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-5">
+            <span className="text-3xl">⏳</span>
+          </div>
+          <h2 className="text-xl font-bold text-[var(--color-charcoal)] mb-2">
+            Account Pending Approval
+          </h2>
+          <p className="text-gray-500 text-sm mb-4">
+            Your partner account is under review. Our admin team will approve you within 24 hours.
+          </p>
+          <p className="text-amber-700 text-sm font-medium bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6">
+            📞 Need faster approval? Call us at{" "}
+            <a href="tel:7303584266" className="underline font-bold">7303584266</a>
+          </p>
+          <SignOutButton className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium transition-colors" />
+        </div>
+      </div>
+    );
+  }
+
   const displayName =
     profile?.full_name ??
     (user.user_metadata?.full_name as string | undefined) ??
