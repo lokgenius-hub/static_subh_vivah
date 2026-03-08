@@ -1,8 +1,8 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 // Using @supabase/supabase-js directly (not @supabase/ssr) because this is a
-// static export — there is no server. @supabase/ssr's createBrowserClient tries
-// to sync auth session via cookies on every call, which hangs in a plain browser.
+// static export — there is no server. Session is persisted to localStorage so
+// the same session is shared across tabs on the same origin.
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
   "https://qvuxmnysvmebwpiupink.supabase.co";
@@ -18,9 +18,10 @@ export function createClient() {
   if (!_client) {
     _client = createSupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
-        persistSession: false,    // no localStorage session needed for public data
-        autoRefreshToken: false,  // no token refresh needed
-        detectSessionInUrl: false,
+        persistSession: true,     // save session to localStorage so new tabs stay logged in
+        autoRefreshToken: true,   // auto-refresh token before expiry
+        detectSessionInUrl: true, // pick up session from URL hash (email confirm / OAuth)
+        storageKey: "sb-vivahsthal-auth", // stable key so tabs share the same session
       },
     });
   }
