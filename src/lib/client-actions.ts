@@ -230,62 +230,56 @@ export async function checkAvailability(venueId: string, date: string, slotType:
 // ============================================================
 
 export async function createLead(formData: FormData) {
-  const supabase = createClient();
+  const SUPABASE_URL =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    "https://qvuxmnysvmebwpiupink.supabase.co";
+  const SUPABASE_ANON_KEY =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2dXhtbnlzdm1lYndwaXVwaW5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0MjkxNzQsImV4cCI6MjA4ODAwNTE3NH0.hT0XA9KvGk-tEwOM2L1rNCddgDP55gOeNHFBQ6qMWRc";
 
   const rawVenueId = formData.get("venue_id") as string | null;
   const isValidUUID = rawVenueId &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawVenueId);
 
-  const leadData: Record<string, unknown> = {
-    venue_id: isValidUUID ? rawVenueId : null,
-    customer_name: formData.get("customer_name") as string,
-    customer_email: formData.get("customer_email") as string,
+  // Get logged-in user id if available (optional — public visitors won't have one)
+  let customerId: string | null = null;
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    customerId = user?.id ?? null;
+  } catch { /* no session — that's fine */ }
+
+  const payload: Record<string, unknown> = {
+    venue_id:       isValidUUID ? rawVenueId : null,
+    customer_name:  formData.get("customer_name") as string,
+    customer_email: (formData.get("customer_email") as string) || null,
     customer_phone: formData.get("customer_phone") as string,
-    event_date: formData.get("event_date") as string || null,
-    slot_preference: formData.get("slot_preference") as string || null,
-    guest_count: formData.get("guest_count") ? parseInt(formData.get("guest_count") as string) : null,
-    budget_range: formData.get("budget_range") as string || null,
-    message: formData.get("message") as string || null,
-    source: (formData.get("source") as string) || "website",
-    status: "new",
+    event_date:     (formData.get("event_date") as string) || null,
+    slot_preference:(formData.get("slot_preference") as string) || null,
+    guest_count:    formData.get("guest_count") ? parseInt(formData.get("guest_count") as string) : null,
+    budget_range:   (formData.get("budget_range") as string) || null,
+    message:        (formData.get("message") as string) || null,
+    source:         (formData.get("source") as string) || "website",
+    customer_id:    customerId,
   };
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) {
-    leadData.customer_id = user.id;
-    leadData.user_id = user.id;
+  // Route through edge function — uses service role to bypass RLS cache issues
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/submit-lead`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+        "apikey": SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = await res.json();
+    if (result.success) return { success: true, lead: result.lead };
+    return { success: false, error: result.error ?? "Failed to submit enquiry" };
+  } catch (err) {
+    return { success: false, error: "Network error. Please check your connection." };
   }
-
-  const { data, error } = await supabase
-    .from("leads")
-    .insert(leadData)
-    .select()
-    .single();
-
-  if (error) {
-    // Retry without optional columns
-    const altData: Record<string, unknown> = {
-      venue_id: isValidUUID ? rawVenueId : null,
-      customer_name: formData.get("customer_name") as string,
-      customer_email: formData.get("customer_email") as string,
-      customer_phone: formData.get("customer_phone") as string,
-      event_date: formData.get("event_date") as string || null,
-      guest_count: formData.get("guest_count") ? parseInt(formData.get("guest_count") as string) : null,
-      message: formData.get("message") as string || null,
-      status: "new",
-    };
-    if (user) altData.customer_id = user.id;
-
-    const r2 = await supabase.from("leads").insert(altData).select().single();
-    if (r2.error) return { success: false, error: r2.error.message };
-
-    // Also save to enquiry_inbox
-    await saveToInbox(supabase, formData, isValidUUID ? rawVenueId : null, r2.data?.id);
-    return { success: true, lead: r2.data };
-  }
-
-  await saveToInbox(supabase, formData, isValidUUID ? rawVenueId : null, data?.id);
-  return { success: true, lead: data };
 }
 
 /** Helper: save enquiry to inbox table */
