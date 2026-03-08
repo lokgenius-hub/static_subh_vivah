@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192",
+        model: "llama-3.1-8b-instant",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           ...userMessages,
@@ -87,9 +87,9 @@ Deno.serve(async (req) => {
 
     if (!groqRes.ok) {
       const errText = await groqRes.text();
-      console.error("GROQ error:", errText);
+      console.error("GROQ error:", groqRes.status, errText);
       return new Response(
-        JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }),
+        JSON.stringify({ error: `AI service error (${groqRes.status}). Please try again later.`, detail: errText }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
